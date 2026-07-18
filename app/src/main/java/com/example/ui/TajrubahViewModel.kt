@@ -21,6 +21,7 @@ sealed class Screen {
     object Wallet : Screen()
     object Bookings : Screen()
     object Dashboard : Screen()
+    object ProjectDocs : Screen()
 }
 
 enum class PlatformRole {

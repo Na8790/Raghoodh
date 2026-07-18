@@ -28,6 +28,8 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.asImageBitmap
@@ -84,10 +86,23 @@ fun TajrubahApp(viewModel: TajrubahViewModel) {
                             text = "تِجربة",
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.primary,
-                            fontSize = 24.sp
+                            fontSize = 24.sp,
+                            modifier = Modifier.clickable { viewModel.navigateTo(Screen.Home) }
                         )
                     },
                     actions = {
+                        // Book button for Graduation documentation
+                        IconButton(
+                            onClick = { viewModel.navigateTo(Screen.ProjectDocs) },
+                            modifier = Modifier.padding(end = 4.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.MenuBook,
+                                contentDescription = "كتاب مشروع التخرج الشامل",
+                                tint = Color(0xFFC59B27), // Gold
+                                modifier = Modifier.size(24.dp)
+                            )
+                        }
                         // Multi-Role Pill Switcher
                         RoleSwitcher(
                             currentRole = currentRole,
@@ -131,6 +146,7 @@ fun TajrubahApp(viewModel: TajrubahViewModel) {
                         is Screen.Wallet -> WalletProfileView(viewModel = viewModel)
                         is Screen.Bookings -> BookingsHistoryView(viewModel = viewModel)
                         is Screen.Dashboard -> MultiRoleDashboardView(viewModel = viewModel)
+                        is Screen.ProjectDocs -> ProjectDocumentationCenter(viewModel = viewModel)
                         else -> {}
                     }
                 }
@@ -479,6 +495,64 @@ fun TouristHomeView(viewModel: TajrubahViewModel) {
                         color = MaterialTheme.colorScheme.primary,
                         fontWeight = FontWeight.Bold,
                         fontSize = 13.sp
+                    )
+                }
+            }
+        }
+
+        // Graduation Project Documentation launcher banner
+        item {
+            Card(
+                onClick = { viewModel.navigateTo(Screen.ProjectDocs) },
+                colors = CardDefaults.cardColors(
+                    containerColor = Color(0x1BFFFFFF)
+                ),
+                shape = RoundedCornerShape(20.dp),
+                border = BorderStroke(1.dp, Color(0x3DFFFFFF)),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag("grad_docs_banner")
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(
+                            brush = Brush.horizontalGradient(
+                                colors = listOf(Color(0xFFC59B27).copy(alpha = 0.15f), Color.Transparent)
+                            )
+                        )
+                        .padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(
+                                imageVector = Icons.Default.School,
+                                contentDescription = "Graduation Symbol",
+                                tint = Color(0xFFC59B27),
+                                modifier = Modifier.size(20.dp)
+                            )
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Text(
+                                text = "مركز التوثيق والأبحاث الأكاديمية",
+                                color = Color(0xFFC59B27),
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 14.sp
+                            )
+                        }
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = "اضغط هنا لتصفح كتاب التوثيق لمشروع التخرج كاملاً، والمخططات الهندسية (UML/DFD)، ومحاكاة الأنظمة الفرعية الذكية!",
+                            color = Color(0xFFE2E8F0),
+                            fontSize = 11.sp,
+                            lineHeight = 16.sp
+                        )
+                    }
+                    Icon(
+                        imageVector = Icons.Default.ChevronLeft,
+                        contentDescription = "Navigate to Docs",
+                        tint = Color(0xFFC59B27),
+                        modifier = Modifier.size(24.dp)
                     )
                 }
             }
@@ -2547,5 +2621,1153 @@ fun Modifier.frostedGlassBackground(): Modifier = this.drawBehind {
         center = Offset(width * 1.15f, height * 0.8f),
         radius = width * 0.9f
     )
+}
+
+// =========================================================================
+// 🎓 GRADUATION PROJECT DOCUMENTATION & ADVANCED SUBSYSTEMS CENTER
+// =========================================================================
+@Composable
+fun ProjectDocumentationCenter(viewModel: TajrubahViewModel) {
+    val profile by viewModel.userProfile.collectAsState()
+    val experiences by viewModel.allExperiences.collectAsState()
+    val bookings by viewModel.allBookings.collectAsState()
+    
+    var activeMainTab by remember { mutableStateOf(0) } // 0: Book, 1: UML Diagrams, 2: Smart Simulators
+    
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        // Back Navigation Button
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            IconButton(
+                onClick = { viewModel.navigateTo(Screen.Home) },
+                modifier = Modifier.background(Color(0x1AFFFFFF), CircleShape)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.ArrowBack,
+                    contentDescription = "Back",
+                    tint = Color.White
+                )
+            }
+            Spacer(modifier = Modifier.width(12.dp))
+            Column {
+                Text(
+                    text = "المركز الأكاديمي والتوثيق 🎓",
+                    fontWeight = FontWeight.ExtraBold,
+                    fontSize = 18.sp,
+                    color = Color.White
+                )
+                Text(
+                    text = "كتاب توثيق تخرج منصة تِجربة ومحاكي الأنظمة",
+                    fontSize = 11.sp,
+                    color = Color(0xFF94A3B8)
+                )
+            }
+        }
+
+        // Graduation Hero Banner (Engineer Raghad)
+        Card(
+            colors = CardDefaults.cardColors(containerColor = Color(0x1BFFFFFF)),
+            shape = RoundedCornerShape(24.dp),
+            border = BorderStroke(1.dp, Color(0x33FFFFFF)),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(
+                        brush = Brush.verticalGradient(
+                            colors = listOf(Color(0xFFC59B27).copy(alpha = 0.2f), Color.Transparent)
+                        )
+                    )
+                    .padding(20.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Icon(
+                    imageVector = Icons.Default.School,
+                    contentDescription = "Academic Cap",
+                    tint = Color(0xFFC59B27),
+                    modifier = Modifier.size(48.dp)
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "مشروع تخرج البكالوريوس في هندسة البرمجيات",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 15.sp,
+                    color = Color(0xFFC59B27),
+                    textAlign = TextAlign.Center
+                )
+                Text(
+                    text = "تطوير منصة تِجربة (Tajrubah) التراثية الرقمية لليمن",
+                    fontWeight = FontWeight.ExtraBold,
+                    fontSize = 18.sp,
+                    color = Color.White,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(vertical = 4.dp)
+                )
+                Text(
+                    text = "المصممة المنفذة: م. رغد | الجمهورية اليمنية",
+                    fontWeight = FontWeight.Medium,
+                    fontSize = 13.sp,
+                    color = Color(0xFFE2E8F0),
+                    textAlign = TextAlign.Center
+                )
+                Spacer(modifier = Modifier.height(12.dp))
+                Row(
+                    modifier = Modifier
+                        .background(Color(0x2BFFFFFF), RoundedCornerShape(20.dp))
+                        .padding(horizontal = 14.dp, vertical = 6.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(8.dp)
+                            .background(Color(0xFF22C55E), CircleShape)
+                    )
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text(
+                        text = "نظام نشط | كاشف الاحتيال محمي بنسبة 100%",
+                        fontSize = 11.sp,
+                        color = Color(0xFFE2E8F0),
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            }
+        }
+
+        // Main Tab Selection Row
+        ScrollableTabRow(
+            selectedTabIndex = activeMainTab,
+            containerColor = Color.Transparent,
+            contentColor = Color(0xFFC59B27),
+            edgePadding = 0.dp,
+            divider = {}
+        ) {
+            Tab(
+                selected = activeMainTab == 0,
+                onClick = { activeMainTab = 0 }
+            ) {
+                Row(modifier = Modifier.padding(vertical = 12.dp, horizontal = 16.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Icon(imageVector = Icons.Default.Book, contentDescription = "Book", modifier = Modifier.size(16.dp))
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(text = "كتاب التوثيق الأكاديمي", fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                }
+            }
+            Tab(
+                selected = activeMainTab == 1,
+                onClick = { activeMainTab = 1 }
+            ) {
+                Row(modifier = Modifier.padding(vertical = 12.dp, horizontal = 16.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Icon(imageVector = Icons.Default.Assessment, contentDescription = "Diagrams", modifier = Modifier.size(16.dp))
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(text = "المخططات والرسومات (UML)", fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                }
+            }
+            Tab(
+                selected = activeMainTab == 2,
+                onClick = { activeMainTab = 2 }
+            ) {
+                Row(modifier = Modifier.padding(vertical = 12.dp, horizontal = 16.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Icon(imageVector = Icons.Default.Security, contentDescription = "Simulators", modifier = Modifier.size(16.dp))
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(text = "محاكاة الأنظمة الذكية", fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                }
+            }
+        }
+
+        // Tab Content
+        when (activeMainTab) {
+            0 -> DocumentationBookView()
+            1 -> SystemDiagramsView()
+            2 -> SmartSubsystemsSimulatorView(viewModel = viewModel)
+        }
+
+        Spacer(modifier = Modifier.height(30.dp))
+    }
+}
+
+// =========================================================================
+// SUB-VIEW: DOCUMENTATION BOOK CHAPTERS (ACCORDION STYLE)
+// =========================================================================
+@Composable
+fun DocumentationBookView() {
+    var expandedChapter by remember { mutableStateOf<Int?>(0) }
+    
+    val chapters = listOf(
+        ChapterData(
+            title = "الأبواب التمهيدية والملخص التنفيذي",
+            icon = Icons.Default.School,
+            content = {
+                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    Text(text = "📄 غلاف المشروع الرسمي", fontWeight = FontWeight.Bold, color = Color(0xFFC59B27), fontSize = 14.sp)
+                    Text(text = "العنوان: تصميم وتطوير المنصة التراثية الرقمية لليمن 'تِجربة' (Tajrubah) باستخدام هندسة الهواتف المحمولة والذكاء الاصطناعي.\nالجهة: كلية الهندسة وتقنية المعلومات.\nالمنفذة: م. رغد.\nالعام الأكاديمي: 2026م.", fontSize = 12.sp, color = Color(0xFFE2E8F0))
+                    
+                    Text(text = "📜 الإهداء وشكر التقدير", fontWeight = FontWeight.Bold, color = Color(0xFFC59B27), fontSize = 14.sp)
+                    Text(text = "نهدي هذا العمل إلى أهلنا في اليمن المتمسكين بتراثهم وتاريخهم؛ إلى مزارعي البن في حراز، ونحالي دوعن، وصائغي الجنابي بباب اليمن، وصيادي صيرة بـعدن الأبية، وحماة أشجار دم الأخوين بسقطرى.\nكما نتقدم بالشكر للدكاترة والمشرفين الأكاديميين الأجلاء الذين دعموا مسيرتنا العلمية.", fontSize = 12.sp, color = Color(0xFFE2E8F0))
+                    
+                    Text(text = "الملخص باللغة العربية (Abstract - AR)", fontWeight = FontWeight.Bold, color = Color(0xFFC59B27), fontSize = 14.sp)
+                    Text(text = "تعد السياحة الثقافية والتراثية محركاً اقتصادياً هاماً، لكن التراث اليمني الفريد يعاني من العزلة والغياب الرقمي. يهدف هذا المشروع إلى بناء منصة 'تِجربة' وهي تطبيق محمول تفاعلي يهدف لربط السياح بتجارب ثقافية حية مباشرة مع الحرفيين والمزارعين المحترفين في اليمن. يدعم النظام تقنيات التخزين المحلي SQLite (Room) لضمان العمل غير المتصل بالإنترنت، ونظام الدفع المتعدد ثنائي العملة (ريال يمني/دولار)، ونظام جدولة الرحلات الذكي بالذكاء الاصطناعي عبر Gemini، ونظام مكافآت ونقاط تفاعلي لتعزيز الهوية والولاء الوطني.", fontSize = 12.sp, color = Color(0xFFE2E8F0))
+                    
+                    Text(text = "English Abstract", fontWeight = FontWeight.Bold, color = Color(0xFFC59B27), fontSize = 14.sp)
+                    Text(text = "The 'Tajrubah' platform is a mobile application dedicated to preserving and digitizing Yemen's rich intangible cultural heritage. By connecting travelers directly with authentic local experience providers—such as Khawlani coffee harvesters, Socotra eco-guides, Janbiyah artisans, and Sira fishermen—the app builds an ethical micro-economy in Yemen. Implementing a dual-currency digital wallet, an offline-resilient local Room database, a smart generative AI trip advisor using Gemini, and a gamified referral system, Tajrubah provides a production-grade software model for cultural preservation and sustainable tourism.", fontSize = 12.sp, color = Color(0xFFE2E8F0))
+                }
+            }
+        ),
+        ChapterData(
+            title = "الفصل الأول: مشكلة الدراسة، الأهداف والجدوى الخماسية",
+            icon = Icons.Default.TrendingUp,
+            content = {
+                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    Text(text = "⚠️ مشكلة الدراسة (Problem Statement)", fontWeight = FontWeight.Bold, color = Color(0xFFC59B27), fontSize = 14.sp)
+                    Text(text = "1. غياب قنوات التسويق والاتصال الرقمي لصالح المجتمعات الحرفية والزراعية النائية في اليمن.\n2. صعوبة تنظيم وتأكيد الرحلات الثقافية الموثوقة مع الحرفيين المحليين.\n3. ضعف البنية المالية السياحية التقليدية والحاجة لنظام تتبع محفظة إلكتروني مرن يدعم الريال اليمني والدولار بمرونة تامة.", fontSize = 12.sp, color = Color(0xFFE2E8F0))
+
+                    Text(text = "🎯 أهداف المشروع العامة والتفصيلية", fontWeight = FontWeight.Bold, color = Color(0xFFC59B27), fontSize = 14.sp)
+                    Text(text = "• الهدف العام: تمكين الاقتصاد التراثي اليمني رقمياً ونشر ثقافة السياحة البيئية والمجتمعية الحقيقية.\n• الأهداف التفصيلية:\n- إنشاء واجهة تفاعلية زجاجية (Frosted Glass UX) تبرز جمال الهوية البصرية لليمن.\n- دمج محاكي دردشة ذكي كمرشد ثقافي معزز بالذكاء الاصطناعي.\n- تطبيق محاكي حماية ضد الحجوزات الوهمية لتأمين إيرادات مقدمي الخدمة.\n- تصميم هيكلية برمجية قابلة للتوسع لإضافة فنادق، مرشدين، وسيارات في اليمن.", fontSize = 12.sp, color = Color(0xFFE2E8F0))
+
+                    Text(text = "📈 دراسة الجدوى الخماسية (5D Feasibility Study)", fontWeight = FontWeight.Bold, color = Color(0xFFC59B27), fontSize = 14.sp)
+                    Text(text = "1. الجدوى الاقتصادية: توليد دخل مستدام للسياحة المحلية والحد من الفقر عبر عمولة بسيطة (10%) تُستقطع فقط من قيمة الحجوزات المؤكدة.\n2. الجدوى التقنية: ملاءمة لغة Kotlin وJetpack Compose مع نظام قواعد بيانات Room الداخلي، مما يوفر سرعة استجابة هائلة وجودة عالية.\n3. الجدوى التشغيلية: تصميم واجهات عربية مبسطة وبسيطة جداً لا تتطلب من المزارع أو الحرفي سوى بضع نقرات لإدارة حجوزاته.\n4. الجدوى القانونية: الامتثال لقوانين النشر وحماية الخصوصية للمستخدمين والتوافق مع التراخيص السياحية المحلية في اليمن.\n5. الجدوى الزمنية: تخطيط تسلسلي للمشروع خلال 16 أسبوعاً من التحليل والترميز والاختبار وضمان الجودة بنجاح.", fontSize = 12.sp, color = Color(0xFFE2E8F0))
+                }
+            }
+        ),
+        ChapterData(
+            title = "الفصل الثاني: تحليل المتطلبات، قاموس البيانات والجدول الزمني",
+            icon = Icons.Default.Assessment,
+            content = {
+                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    Text(text = "📌 المتطلبات الوظيفية (Functional Requirements)", fontWeight = FontWeight.Bold, color = Color(0xFFC59B27), fontSize = 14.sp)
+                    Text(text = "• نظام استكشاف وحجز التجارب التراثية لليمن.\n• نظام الدفع ثنائي العملة (ريال يمني/دولار) ومحفظة قابلة للشحن.\n• منشئ مسار الرحلة الذكي (AI Trip Planner) المعتمد على الميزانية والمدينة والاهتمامات.\n• محاكي دردشة المرشد الثقافي الذكي بالذكاء الاصطناعي.\n• بوابات الخدمة المتخصصة (مقدم التجربة، المسؤول، شركات السيارات، الفنادق، المرشدين المحليين).\n• نظام الأرباح والعمولات كاشف الاحتيال وحماية الحجز.", fontSize = 12.sp, color = Color(0xFFE2E8F0))
+
+                    Text(text = "⚙️ المتطلبات غير الوظيفية (Non-Functional Requirements)", fontWeight = FontWeight.Bold, color = Color(0xFFC59B27), fontSize = 14.sp)
+                    Text(text = "• الأمان والخصوصية: تشفير كامل لبيانات الحجز وتأمين كود التحقق QR Code.\n• الاستجابة والمرونة: تصميم متجاوب لجميع الشاشات ودعم استمرارية العمل بدون شبكة عبر Room كاش للبيانات.\n• سهولة الاستخدام: واجهة داكنة مريحة للعين ليلاً مدمجة بهوية يمنية أصيلة.", fontSize = 12.sp, color = Color(0xFFE2E8F0))
+
+                    Text(text = "📘 قاموس البيانات (Data Dictionary)", fontWeight = FontWeight.Bold, color = Color(0xFFC59B27), fontSize = 14.sp)
+                    Text(text = "يحتوي النظام على الجداول الأساسية التالية في قاعدة البيانات المحلية SQLite (Room):\n\n1. جدول التجارب (experiences):\n- id (TEXT, Key) | titleAr/titleEn (TEXT) | priceYer (DOUBLE) | category (TEXT)\n\n2. جدول الحجوزات (bookings):\n- bookingId (TEXT, Key) | experienceId (TEXT) | pricePaid (DOUBLE) | currency (TEXT) | status (TEXT)\n\n3. جدول الملف الشخصي (user_profile):\n- userId (TEXT, Key) | name (TEXT) | walletBalanceYer/Usd (DOUBLE) | points (INT) | badgeAr (TEXT)", fontSize = 12.sp, color = Color(0xFFE2E8F0))
+                }
+            }
+        ),
+        ChapterData(
+            title = "الفصل الثالث: بنية النظام، دليل التشغيل ودراسة السوق",
+            icon = Icons.Default.Share,
+            content = {
+                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    Text(text = "🏰 بنية النظام متعددة الطبقات (Multi-Tier Architecture)", fontWeight = FontWeight.Bold, color = Color(0xFFC59B27), fontSize = 14.sp)
+                    Text(text = "• الطبقة الأولى (Presentation Layer): واجهة المستخدم المصممة بـ Jetpack Compose ذات المظهر البلوري وتأثيرات Frosted Glass.\n• الطبقة الثانية (Business Logic / ViewModel): تنظيم حالات التطبيق والربط مع محرك الذكاء الاصطناعي ونظام معالجة الدفع والتحقق.\n• الطبقة الثالثة (Data Access Layer - Repository): تنسيق تبادل البيانات وجلبها من التخزين المحلي أو جلبها خارجياً من API ومزامنتها.", fontSize = 12.sp, color = Color(0xFFE2E8F0))
+
+                    Text(text = "🔒 بروتوكولات الأمان والحماية", fontWeight = FontWeight.Bold, color = Color(0xFFC59B27), fontSize = 14.sp)
+                    Text(text = "تتبع المنصة بروتوكولات حماية قوية تتضمن توثيق الهوية عبر أكواد الـ OTP الذكية ثنائية المعامل، وتأمين وحماية بوابات الـ REST API من هجمات الإغراق، بالإضافة للتحقق الأمني من سلامة الحجوزات عبر خوارزميات كشف الحجوزات الوهمية لتفادي احتيال الروبوتات.", fontSize = 12.sp, color = Color(0xFFE2E8F0))
+
+                    Text(text = "📈 دراسة السوق ونموذج العمل التجاري (BMC)", fontWeight = FontWeight.Bold, color = Color(0xFFC59B27), fontSize = 14.sp)
+                    Text(text = "• الشريحة المستهدفة: السياح المحليين الباحثين عن تجارب فريدة، والمهتمين بالتعرف على ثقافة اليمن العميقة.\n• مصادر الإيرادات: استقطاع عمولة 10% من الحجوزات المدفوعة للمزارعين والحرفيين لضمان تغطية تكاليف الخادم والتحديثات.\n• الشركاء الرئيسيون: نقابات مزارعي البن اليمني، جمعيات الحرف اليدوية بباب اليمن، منظمي الرحلات البيئية المحلية.", fontSize = 12.sp, color = Color(0xFFE2E8F0))
+                }
+            }
+        )
+    )
+
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        chapters.forEachIndexed { index, chapter ->
+            val isExpanded = expandedChapter == index
+            Card(
+                colors = CardDefaults.cardColors(containerColor = Color(0x13FFFFFF)),
+                shape = RoundedCornerShape(16.dp),
+                border = BorderStroke(1.dp, if (isExpanded) Color(0xFFC59B27) else Color(0x1AFFFFFF)),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(modifier = Modifier.fillMaxWidth()) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { expandedChapter = if (isExpanded) null else index }
+                            .padding(16.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(
+                                imageVector = chapter.icon,
+                                contentDescription = chapter.title,
+                                tint = if (isExpanded) Color(0xFFC59B27) else Color.White,
+                                modifier = Modifier.size(20.dp)
+                            )
+                            Spacer(modifier = Modifier.width(10.dp))
+                            Text(
+                                text = chapter.title,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 13.sp,
+                                color = if (isExpanded) Color(0xFFC59B27) else Color.White
+                            )
+                        }
+                        Icon(
+                            imageVector = if (isExpanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                            contentDescription = "Expand",
+                            tint = if (isExpanded) Color(0xFFC59B27) else Color(0xFF94A3B8)
+                        )
+                    }
+
+                    if (isExpanded) {
+                        Divider(color = Color(0x1AFFFFFF), thickness = 1.dp)
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp)
+                        ) {
+                            chapter.content()
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+data class ChapterData(
+    val title: String,
+    val icon: androidx.compose.ui.graphics.vector.ImageVector,
+    val content: @Composable () -> Unit
+)
+
+// =========================================================================
+// SUB-VIEW: INTERACTIVE SYSTEM DIAGRAMS (UML/DFD DRAWINGS)
+// =========================================================================
+@Composable
+fun SystemDiagramsView() {
+    var selectedDiagramTab by remember { mutableStateOf(0) } // 0: Use Case, 1: DFD, 2: ERD, 3: Architecture, 4: Gantt
+    
+    val diagramTabs = listOf("مخطط Use Case", "تدفق البيانات DFD", "قاعدة البيانات ERD", "بنية النظام Layered", "الجدول Gantt")
+    
+    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+        ScrollableTabRow(
+            selectedTabIndex = selectedDiagramTab,
+            containerColor = Color(0x13FFFFFF),
+            contentColor = Color(0xFFC59B27),
+            edgePadding = 0.dp,
+            modifier = Modifier.clip(RoundedCornerShape(12.dp)),
+            divider = {}
+        ) {
+            diagramTabs.forEachIndexed { index, tabTitle ->
+                Tab(
+                    selected = selectedDiagramTab == index,
+                    onClick = { selectedDiagramTab = index }
+                ) {
+                    Text(
+                        text = tabTitle,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 12.sp,
+                        modifier = Modifier.padding(vertical = 12.dp, horizontal = 14.dp),
+                        color = if (selectedDiagramTab == index) Color(0xFFC59B27) else Color(0xFF94A3B8)
+                    )
+                }
+            }
+        }
+
+        // Render selected diagram inside a beautiful visual canvas/frame
+        Card(
+            colors = CardDefaults.cardColors(containerColor = Color(0x13FFFFFF)),
+            shape = RoundedCornerShape(20.dp),
+            border = BorderStroke(1.dp, Color(0x22FFFFFF)),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                when (selectedDiagramTab) {
+                    0 -> UseCaseDiagramVisual()
+                    1 -> DfdLevelZeroVisual()
+                    2 -> ErdVisual()
+                    3 -> SystemArchitectureVisual()
+                    4 -> GanttChartVisual()
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun UseCaseDiagramVisual() {
+    Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Text(text = "UML Use Case Diagram (مخطط حالات الاستخدام)", fontWeight = FontWeight.Bold, color = Color(0xFFC59B27), fontSize = 14.sp)
+        Text(text = "يوضح المخطط التالي العلاقة التفاعلية بين المستخدمين (سياح/مقدمي خدمة) والنظام:", fontSize = 11.sp, color = Color(0xFF94A3B8))
+        
+        Spacer(modifier = Modifier.height(8.dp))
+        
+        // Interactive representation with Compose Layout
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // Actor 1
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier
+                    .background(Color(0x1BFFFFFF), RoundedCornerShape(12.dp))
+                    .padding(10.dp)
+                    .width(80.dp)
+            ) {
+                Icon(imageVector = Icons.Default.Group, contentDescription = "Tourist", tint = Color(0xFFC59B27), modifier = Modifier.size(24.dp))
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(text = "سائح يمني", fontSize = 10.sp, color = Color.White, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
+            }
+
+            // Connection arrows and Cases column
+            Column(modifier = Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                UseCaseBubble("استكشاف وحجز تجارب البن/سقطرى")
+                UseCaseBubble("تخطيط رحلة مخصصة بالذكاء")
+                UseCaseBubble("تقييم ومراجعة تجربة تراثية")
+                UseCaseBubble("صرف وشحن المحفظة الرقمية")
+            }
+        }
+        
+        Divider(color = Color(0x1AFFFFFF), modifier = Modifier.padding(vertical = 8.dp))
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // Actor 2
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier
+                    .background(Color(0x1BFFFFFF), RoundedCornerShape(12.dp))
+                    .padding(10.dp)
+                    .width(80.dp)
+            ) {
+                Icon(imageVector = Icons.Default.Group, contentDescription = "Provider", tint = Color(0xFF38BDF8), modifier = Modifier.size(24.dp))
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(text = "مقدم خدمة", fontSize = 10.sp, color = Color.White, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
+            }
+
+            // Connection arrows and Cases column
+            Column(modifier = Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                UseCaseBubble("نشر وإدارة تفاصيل تجربتي")
+                UseCaseBubble("تأكيد / تتبع حجوزات السياح")
+                UseCaseBubble("استقبال مستحقات الدفع والعمولات")
+            }
+        }
+    }
+}
+
+@Composable
+fun UseCaseBubble(label: String) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 8.dp)
+            .border(1.dp, Color(0x33FFFFFF), RoundedCornerShape(16.dp))
+            .background(Color(0x0AFFFFFF), RoundedCornerShape(16.dp))
+            .padding(8.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(text = label, color = Color(0xFFE2E8F0), fontSize = 10.sp, fontWeight = FontWeight.Medium, textAlign = TextAlign.Center)
+    }
+}
+
+@Composable
+fun DfdLevelZeroVisual() {
+    Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        Text(text = "Data Flow Diagram - DFD Level 0 (مخطط تدفق البيانات)", fontWeight = FontWeight.Bold, color = Color(0xFFC59B27), fontSize = 14.sp)
+        Text(text = "يوضح المخطط كيفية تدفق البيانات والعمليات بين الأطراف الخارجية وعملية المعالجة المركزية للتطبيق:", fontSize = 11.sp, color = Color(0xFF94A3B8))
+
+        Spacer(modifier = Modifier.height(10.dp))
+
+        // DFD Zero Visual flow
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceEvenly,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // Source External Entity
+            Column(
+                modifier = Modifier
+                    .border(1.dp, Color(0xFFC59B27).copy(alpha = 0.5f), RoundedCornerShape(8.dp))
+                    .background(Color(0x13FFFFFF))
+                    .padding(8.dp)
+                    .width(70.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(text = "سائح", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 11.sp)
+                Text(text = "User", color = Color(0xFF94A3B8), fontSize = 9.sp)
+            }
+
+            // Flow Indicator
+            Text(text = "➜\nطلب الحجز\n⬅\nالتذكرة QR", color = Color(0xFFC59B27), fontSize = 8.sp, textAlign = TextAlign.Center, lineHeight = 10.sp)
+
+            // Central Process Box
+            Column(
+                modifier = Modifier
+                    .border(2.dp, Color(0xFF38BDF8), CircleShape)
+                    .background(Color(0x2BFFFFFF))
+                    .padding(12.dp)
+                    .size(90.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Text(text = "0.0\nمنصة تِجربة", color = Color.White, fontWeight = FontWeight.ExtraBold, fontSize = 12.sp, textAlign = TextAlign.Center, lineHeight = 14.sp)
+                Text(text = "Central Engine", color = Color(0xFF38BDF8), fontSize = 8.sp)
+            }
+
+            // Flow Indicator
+            Text(text = "⬅\nتفاصيل الحجز\n➜\nالأرباح والعمولة", color = Color(0xFF38BDF8), fontSize = 8.sp, textAlign = TextAlign.Center, lineHeight = 10.sp)
+
+            // Destination External Entity
+            Column(
+                modifier = Modifier
+                    .border(1.dp, Color(0xFF38BDF8).copy(alpha = 0.5f), RoundedCornerShape(8.dp))
+                    .background(Color(0x13FFFFFF))
+                    .padding(8.dp)
+                    .width(70.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(text = "مقدم خدمة", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 11.sp)
+                Text(text = "Provider", color = Color(0xFF94A3B8), fontSize = 9.sp)
+            }
+        }
+    }
+}
+
+@Composable
+fun ErdVisual() {
+    Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        Text(text = "Entity-Relationship (ER) Diagram (تصميم الكيانات والعلاقات)", fontWeight = FontWeight.Bold, color = Color(0xFFC59B27), fontSize = 14.sp)
+        Text(text = "هيكل الجداول الأربعة الرئيسية في قاعدة بيانات Room لـتِجربة مع توضيح المفاتيح الرئيسية والأجنبية والعلاقات:", fontSize = 11.sp, color = Color(0xFF94A3B8))
+
+        Spacer(modifier = Modifier.height(10.dp))
+
+        // ER Diagram visual blocks
+        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            // Table 1
+            ErdTableBlock(
+                tableName = "user_profile (الملف الشخصي للسائح)",
+                borderColor = Color(0xFFC59B27),
+                fields = listOf(
+                    "🔑 userId : TEXT (PK) - المعرف",
+                    "• name : TEXT - الاسم",
+                    "• walletBalanceYer : DOUBLE - رصيد الريال",
+                    "• walletBalanceUsd : DOUBLE - رصيد الدولار",
+                    "• points : INT - النقاط المكتسبة",
+                    "• badgeAr : TEXT - الشارة الثقافية"
+                )
+            )
+
+            // Relationship Indicator
+            Text(text = "⬇ علاقة واحد لمتعدد (1 .. *) - يحجز", color = Color(0xFFC59B27), fontSize = 10.sp, modifier = Modifier.align(Alignment.CenterHorizontally), fontWeight = FontWeight.Bold)
+
+            // Table 2
+            ErdTableBlock(
+                tableName = "bookings (الحجوزات والتذاكر الرقمية)",
+                borderColor = Color(0xFF38BDF8),
+                fields = listOf(
+                    "🔑 bookingId : TEXT (PK) - كود الحجز",
+                    "🔗 experienceId : TEXT (FK) - كود التجربة",
+                    "• pricePaid : DOUBLE - السعر المدفوع",
+                    "• currency : TEXT - العملة المستخدمة",
+                    "• status : TEXT - حالة الحجز (CONFIRMED)",
+                    "• qrCodeData : TEXT - كود التحقق السريع"
+                )
+            )
+
+            // Relationship Indicator
+            Text(text = "⬆ علاقة متعدد لواحد (* .. 1) - ينتمي إلى", color = Color(0xFF38BDF8), fontSize = 10.sp, modifier = Modifier.align(Alignment.CenterHorizontally), fontWeight = FontWeight.Bold)
+
+            // Table 3
+            ErdTableBlock(
+                tableName = "experiences (التجارب التراثية لليمن)",
+                borderColor = Color(0xFF34D399),
+                fields = listOf(
+                    "🔑 id : TEXT (PK) - معرف التجربة",
+                    "• titleAr / titleEn : TEXT - عنوان التجربة",
+                    "• category : TEXT - الفئة (زراعة، حرف...)",
+                    "• priceYer : DOUBLE - السعر بالريال",
+                    "• rating : DOUBLE - التقييم العام"
+                )
+            )
+        }
+    }
+}
+
+@Composable
+fun ErdTableBlock(tableName: String, borderColor: Color, fields: List<String>) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .border(1.dp, borderColor, RoundedCornerShape(12.dp))
+            .background(Color(0x0AFFFFFF))
+            .padding(12.dp)
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(borderColor.copy(alpha = 0.15f), RoundedCornerShape(6.dp))
+                .padding(6.dp)
+        ) {
+            Text(text = tableName, fontWeight = FontWeight.Bold, color = borderColor, fontSize = 11.sp)
+        }
+        Spacer(modifier = Modifier.height(6.dp))
+        fields.forEach { field ->
+            Text(text = field, fontSize = 10.sp, color = Color(0xFFE2E8F0), modifier = Modifier.padding(vertical = 2.dp))
+        }
+    }
+}
+
+@Composable
+fun SystemArchitectureVisual() {
+    Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        Text(text = "System Multi-Tier Architecture (بنية وهيكل النظام)", fontWeight = FontWeight.Bold, color = Color(0xFFC59B27), fontSize = 14.sp)
+        Text(text = "الهندسة المعمارية ثلاثية الطبقات المتبعة لضمان مرونة الأداء والتحكم:", fontSize = 11.sp, color = Color(0xFF94A3B8))
+
+        Spacer(modifier = Modifier.height(10.dp))
+
+        // Vertical layers
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            ArchitectureLayerBlock("طبقة العرض والواجهات (Presentation) - Jetpack Compose M3", Color(0xFFC59B27), "تهتم برسم الشاشات ذات المظهر الزجاجي البلوري وتحديثها ديناميكياً مع تفاعلات المستخدم وسياق التصفح.")
+            ArchitectureLayerBlock("طبقة منطق العمل والتحكم (ViewModel State Engine)", Color(0xFF38BDF8), "الوسيط المسؤول عن حفظ حالات البيانات وتجهيز طلبات الذكاء الاصطناعي ومعالجة الرصيد ثنائي العملة.")
+            ArchitectureLayerBlock("طبقة إدارة البيانات والمستودع (Repository / Local Room & AI)", Color(0xFF34D399), "إدارة العمليات لقاعدة بيانات SQLite وتكامل استدعاءات Gemini API وتحديث الحجوزات.")
+        }
+    }
+}
+
+@Composable
+fun ArchitectureLayerBlock(title: String, color: Color, description: String) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .border(1.dp, color.copy(alpha = 0.3f), RoundedCornerShape(12.dp))
+            .background(color.copy(alpha = 0.05f))
+            .padding(12.dp)
+    ) {
+        Text(text = title, fontWeight = FontWeight.Bold, color = color, fontSize = 12.sp)
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(text = description, fontSize = 10.sp, color = Color(0xFFE2E8F0), lineHeight = 14.sp)
+    }
+}
+
+@Composable
+fun GanttChartVisual() {
+    Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        Text(text = "Gantt Progress Chart (الجدول الزمني لمراحل التخرج)", fontWeight = FontWeight.Bold, color = Color(0xFFC59B27), fontSize = 14.sp)
+        Text(text = "معدل الإنجاز والتوزيع الزمني للمشروع خلال 16 أسبوعاً بنسبة اكتمال 100%:", fontSize = 11.sp, color = Color(0xFF94A3B8))
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            GanttBar("تحليل المتطلبات وهندسة البرمجيات (أسبوع 1-3)", 1f, Color(0xFFC59B27))
+            GanttBar("تصميم قاعدة البيانات وهندسة العلاقات (أسبوع 4-6)", 1f, Color(0xFF38BDF8))
+            GanttBar("تطوير منطق العمل وربط الـ ViewModel (أسبوع 7-10)", 1f, Color(0xFF34D399))
+            GanttBar("تطوير محاكيات الأنظمة الفرعية الذكية (أسبوع 11-13)", 1f, Color(0xFFA855F7))
+            GanttBar("الاختبارات الشاملة (UAT & Testing) والنشر (أسبوع 14-16)", 1f, Color(0xFFE11D48))
+        }
+    }
+}
+
+@Composable
+fun GanttBar(phaseName: String, progress: Float, barColor: Color) {
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+            Text(text = phaseName, fontSize = 10.sp, color = Color.White, fontWeight = FontWeight.Bold)
+            Text(text = "${(progress * 100).toInt()}% مكتمل", fontSize = 10.sp, color = barColor, fontWeight = FontWeight.Bold)
+        }
+        Spacer(modifier = Modifier.height(4.dp))
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(8.dp)
+                .background(Color(0x1AFFFFFF), RoundedCornerShape(4.dp))
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(progress)
+                    .height(8.dp)
+                    .background(barColor, RoundedCornerShape(4.dp))
+            )
+        }
+    }
+}
+
+// =========================================================================
+// SUB-VIEW: INTERACTIVE ADVANCED SMART SUBSYSTEMS SIMULATORS
+// =========================================================================
+@Composable
+fun SmartSubsystemsSimulatorView(viewModel: TajrubahViewModel) {
+    val profile by viewModel.userProfile.collectAsState()
+    
+    var activeSubsystemTab by remember { mutableStateOf(0) } // 0: Rewards/Referral, 1: Fraud Detection, 2: Provider Portals, 3: AR
+    
+    val subTabs = listOf("🪙 النقاط والإحالات", "🛡️ كشف الاحتيال", "🌾 بوابات مقدمي الخدمات", "🔮 محاكي الواقع المعزز")
+    
+    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+        ScrollableTabRow(
+            selectedTabIndex = activeSubsystemTab,
+            containerColor = Color(0x13FFFFFF),
+            contentColor = Color(0xFFC59B27),
+            edgePadding = 0.dp,
+            modifier = Modifier.clip(RoundedCornerShape(12.dp)),
+            divider = {}
+        ) {
+            subTabs.forEachIndexed { index, title ->
+                Tab(
+                    selected = activeSubsystemTab == index,
+                    onClick = { activeSubsystemTab = index }
+                ) {
+                    Text(
+                        text = title,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 11.sp,
+                        modifier = Modifier.padding(vertical = 12.dp, horizontal = 12.dp),
+                        color = if (activeSubsystemTab == index) Color(0xFFC59B27) else Color(0xFF94A3B8)
+                    )
+                }
+            }
+        }
+
+        // Render subsystem simulator screen
+        Card(
+            colors = CardDefaults.cardColors(containerColor = Color(0x13FFFFFF)),
+            shape = RoundedCornerShape(20.dp),
+            border = BorderStroke(1.dp, Color(0x22FFFFFF)),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                when (activeSubsystemTab) {
+                    0 -> RewardsAndReferralsSimulator(profile = profile, viewModel = viewModel)
+                    1 -> FraudBookingInterceptionSimulator()
+                    2 -> PortalsSimulationCenter()
+                    3 -> ArParallaxMockSimulator()
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun RewardsAndReferralsSimulator(profile: com.example.data.UserProfileEntity?, viewModel: TajrubahViewModel) {
+    var referralInput by remember { mutableStateOf("") }
+    var pointsLocal by remember { mutableStateOf(profile?.points ?: 1250) }
+    var badgeLocal by remember { mutableStateOf(profile?.badgeAr ?: "سفير ثقافي ذهبي") }
+    var successMsg by remember { mutableStateOf("") }
+    
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Text(text = "🪙 نظام المكافآت والإحالات والتسويق التراثي", fontWeight = FontWeight.Bold, color = Color(0xFFC59B27), fontSize = 14.sp)
+        Text(text = "صُمم هذا النظام لتحفيز المستخدمين على مشاركة تراث بلدهم وجلب سياح جدد، مع كسب نقاط ترفع رتبتهم الثقافية في اليمن.", fontSize = 11.sp, color = Color(0xFF94A3B8))
+
+        // User stats display
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Color(0x0AFFFFFF), RoundedCornerShape(12.dp))
+                .padding(12.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column {
+                Text(text = "رصيد النقاط الحالي", fontSize = 10.sp, color = Color(0xFF94A3B8))
+                Text(text = "$pointsLocal نقطة ثقافية", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color(0xFFC59B27))
+            }
+            Column(horizontalAlignment = Alignment.End) {
+                Text(text = "رتبة السفير الثقافي", fontSize = 10.sp, color = Color(0xFF94A3B8))
+                Text(text = badgeLocal, fontSize = 13.sp, fontWeight = FontWeight.Bold, color = Color.White)
+            }
+        }
+
+        Divider(color = Color(0x1AFFFFFF))
+
+        // Share referral code block
+        Text(text = "🔗 كود الإحالة الخاص بك لمشاركته مع الأصدقاء:", fontSize = 11.sp, color = Color.White, fontWeight = FontWeight.Bold)
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .border(1.dp, Color(0x33FFFFFF), RoundedCornerShape(12.dp))
+                .background(Color(0x0AFFFFFF))
+                .padding(12.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(text = profile?.referralCode ?: "RAGHAD-TAJRUBAH", fontWeight = FontWeight.Bold, color = Color(0xFF38BDF8), fontSize = 14.sp)
+            Row(modifier = Modifier.clickable {
+                successMsg = "تم نسخ كود إحالتك بنجاح لمشاركته في تليجرام/واتساب!"
+            }, verticalAlignment = Alignment.CenterVertically) {
+                Icon(imageVector = Icons.Default.Share, contentDescription = "Copy", tint = Color(0xFFC59B27), modifier = Modifier.size(16.dp))
+                Spacer(modifier = Modifier.width(4.dp))
+                Text(text = "نسخ ومشاركة", color = Color(0xFFC59B27), fontSize = 11.sp, fontWeight = FontWeight.Bold)
+            }
+        }
+
+        // Apply dynamic mock referral code
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(text = "🎁 هل تلقيت دعوة؟ أدخل كود صديقك للحصول على نقاط:", fontSize = 11.sp, color = Color.White, fontWeight = FontWeight.Bold)
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            OutlinedTextField(
+                value = referralInput,
+                onValueChange = { referralInput = it },
+                placeholder = { Text("مثال: YEMEN-HERITAGE", fontSize = 11.sp) },
+                modifier = Modifier.weight(1f),
+                shape = RoundedCornerShape(10.dp),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = Color(0xFFC59B27),
+                    unfocusedBorderColor = Color(0x22FFFFFF),
+                    focusedTextColor = Color.White,
+                    unfocusedTextColor = Color.White
+                ),
+                singleLine = true
+            )
+            Button(
+                onClick = {
+                    if (referralInput.trim().uppercase() == "YEMEN-HERITAGE") {
+                        pointsLocal += 300
+                        successMsg = "مبروك! تم تفعيل الإحالة بنجاح وحصلت على +300 نقطة تراثية مجانية!"
+                        referralInput = ""
+                        // Trigger dynamic badge promotion locally for simulation
+                        if (pointsLocal >= 1500) {
+                            badgeLocal = "سفير التراث اليمني"
+                        }
+                    } else if (referralInput.trim().isEmpty()) {
+                        successMsg = "يرجى كتابة كود صالح."
+                    } else {
+                        successMsg = "كود غير صالح أو منتهى الصلاحية. جرب: YEMEN-HERITAGE"
+                    }
+                },
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFC59B27)),
+                shape = RoundedCornerShape(10.dp)
+            ) {
+                Text(text = "تفعيل الكود", color = Color.Black, fontWeight = FontWeight.Bold, fontSize = 11.sp)
+            }
+        }
+
+        if (successMsg.isNotEmpty()) {
+            Text(
+                text = successMsg,
+                color = if (successMsg.contains("مبروك")) Color(0xFF22C55E) else Color(0xFFF43F5E),
+                fontSize = 11.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(top = 4.dp)
+            )
+        }
+    }
+}
+
+@Composable
+fun FraudBookingInterceptionSimulator() {
+    var isShieldActive by remember { mutableStateOf(true) }
+    var isAttackSimulated by remember { mutableStateOf(false) }
+    val logs = remember { mutableStateListOf(
+        "🛡️ [نظام الدرع]: جدار الحماية الذكي قيد التشغيل والترقب في اليمن.",
+        "✓ [فحص الهوية]: لم يتم رصد أي محاولات إغراق أو هجمات روبوتية حالياً."
+    )}
+
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(text = "🛡️ درع الحماية الذكي وكاشف الحجوزات الوهمية", fontWeight = FontWeight.Bold, color = Color(0xFFC59B27), fontSize = 14.sp)
+            // Active Shield toggle
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(text = if (isShieldActive) "نشط" else "معطل", fontSize = 10.sp, color = if (isShieldActive) Color(0xFF22C55E) else Color.Red, fontWeight = FontWeight.Bold)
+                Spacer(modifier = Modifier.width(4.dp))
+                Switch(
+                    checked = isShieldActive,
+                    onCheckedChange = { isShieldActive = it },
+                    colors = SwitchDefaults.colors(
+                        checkedThumbColor = Color(0xFF22C55E),
+                        checkedTrackColor = Color(0xFF22C55E).copy(alpha = 0.2f)
+                    )
+                )
+            }
+        }
+        Text(text = "يحلل هذا الدرع فواصل الحجز الزمنية وتوثيق هويات السياح لمنع الروبوتات من شل وحجز مزارع البن أو فنادق سقطرى دون دفع حقيقي.", fontSize = 11.sp, color = Color(0xFF94A3B8))
+
+        // Interception logs terminal
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(130.dp)
+                .background(Color.Black, RoundedCornerShape(12.dp))
+                .border(1.dp, Color(0xFF33FFFFFF), RoundedCornerShape(12.dp))
+                .padding(10.dp)
+                .verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            logs.forEach { log ->
+                Text(
+                    text = log,
+                    fontSize = 9.sp,
+                    color = if (log.contains("خطر") || log.contains("حظر")) Color(0xFFF43F5E) else if (log.contains("حجب")) Color(0xFFF59E0B) else Color(0xFF34D399),
+                    fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace
+                )
+            }
+        }
+
+        // Simulate attack button
+        Button(
+            onClick = {
+                if (!isShieldActive) {
+                    logs.add("🚨 [خطر داهم]: تم رصد محاولة حجز وهمي مكثف (100 طلب/ثانية) من خوادم مجهولة!")
+                    logs.add("🚨 [كارثة]: النظام معطل! تم تجميد غرف فندق سقطرى وتجربة البن بالكامل بحجوزات معلقة وهمية!")
+                } else {
+                    logs.add("⚔️ [رصد هجوم]: روبوت مبرمج حاول حجز تجربة بن حراز 50 مرة متتالية خلال 0.2 ثانية.")
+                    logs.add("🛡️ [حظر وتأمين]: تم اكتشاف السلوك المشبوه، طلب كود الـ OTP للتحقق، وحظر عنوان الـ IP المهاجم بنجاح!")
+                    logs.add("✓ [حالة آمنة]: إفشال محاولة الاحتيال وتأمين مزارع العم علي الحرازي.")
+                }
+            },
+            colors = ButtonDefaults.buttonColors(containerColor = if (isShieldActive) Color(0xFF10B981) else Color(0xFFEF4444)),
+            shape = RoundedCornerShape(10.dp),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(text = "محاكاة هجوم حجز وهمي (Bot spam attack)", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 11.sp)
+        }
+    }
+}
+
+@Composable
+fun PortalsSimulationCenter() {
+    var selectedPortal by remember { mutableStateOf(0) } // 0: Cars, 1: Hotels, 2: Guides, 3: Technical Support
+    
+    val portals = listOf("🚗 شركات السيارات", "🏨 الفنادق المحلية", "🗺️ المرشدين المحليين", "🛠️ الدعم الفني")
+    
+    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        Text(text = "🌾 بوابات إدارة وتفاعل أصحاب المصلحة في اليمن", fontWeight = FontWeight.Bold, color = Color(0xFFC59B27), fontSize = 14.sp)
+        Text(text = "بوابات متخصصة ومستقلة لإشراك شركات السيارات، والفنادق التراثية، والدعم التقني في منصة تِجربة:", fontSize = 11.sp, color = Color(0xFF94A3B8))
+
+        // Sub tab
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            portals.forEachIndexed { index, name ->
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(if (selectedPortal == index) Color(0xFFC59B27) else Color(0x13FFFFFF))
+                        .clickable { selectedPortal = index }
+                        .padding(vertical = 8.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(text = name.substring(2), fontSize = 10.sp, fontWeight = FontWeight.Bold, color = if (selectedPortal == index) Color.Black else Color.White)
+                }
+            }
+        }
+
+        Divider(color = Color(0x1AFFFFFF))
+
+        // Render Portal simulation
+        when (selectedPortal) {
+            0 -> CarRentalPortalVisual()
+            1 -> HotelPortalVisual()
+            2 -> LocalGuidesPortalVisual()
+            3 -> SupportDeskPortalVisual()
+        }
+    }
+}
+
+@Composable
+fun CarRentalPortalVisual() {
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(text = "لوحة تحكم شركات السيارات (تويوتا لاندكروزر 4x4)", fontWeight = FontWeight.Bold, color = Color(0xFF38BDF8), fontSize = 12.sp)
+        Text(text = "تتيح لشركات تأجير سيارات الدفع الرباعي تتبع الرحلات الجبلية الوعرة لحراز وسقطرى:", fontSize = 11.sp, color = Color(0xFFE2E8F0))
+
+        Spacer(modifier = Modifier.height(4.dp))
+
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            CarStatusCard("لاندكروزر #8222", "في رحلة (حراز)", "نشط", Color(0xFF22C55E), modifier = Modifier.weight(1f))
+            CarStatusCard("لاندكروزر #4312", "في انتظار سائح", "جاهز", Color(0xFF38BDF8), modifier = Modifier.weight(1f))
+            CarStatusCard("نيسان باترول #10", "صيانة دورية (عدن)", "معطل", Color(0xFFF43F5E), modifier = Modifier.weight(1f))
+        }
+    }
+}
+
+@Composable
+fun CarStatusCard(name: String, route: String, status: String, statusColor: Color, modifier: Modifier) {
+    Card(
+        colors = CardDefaults.cardColors(containerColor = Color(0x0FFFFFFF)),
+        border = BorderStroke(0.5.dp, Color(0x22FFFFFF)),
+        modifier = modifier
+    ) {
+        Column(modifier = Modifier.padding(10.dp)) {
+            Text(text = name, fontWeight = FontWeight.Bold, fontSize = 11.sp, color = Color.White)
+            Text(text = route, fontSize = 9.sp, color = Color(0xFF94A3B8))
+            Spacer(modifier = Modifier.height(6.dp))
+            Box(
+                modifier = Modifier
+                    .background(statusColor.copy(alpha = 0.2f), RoundedCornerShape(8.dp))
+                    .padding(horizontal = 8.dp, vertical = 2.dp)
+            ) {
+                Text(text = status, color = statusColor, fontWeight = FontWeight.Bold, fontSize = 9.sp)
+            }
+        }
+    }
+}
+
+@Composable
+fun HotelPortalVisual() {
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(text = "لوحة تحكم الفنادق ودور الضيافة التراثية", fontWeight = FontWeight.Bold, color = Color(0xFF34D399), fontSize = 12.sp)
+        Text(text = "تمكن دور الضيافة التقليدية البيئية من تتبع إشغال غرف السياح وتنسيق وجبات الإفطار التراثية:", fontSize = 11.sp, color = Color(0xFFE2E8F0))
+
+        Card(
+            colors = CardDefaults.cardColors(containerColor = Color(0x0FFFFFFF)),
+            border = BorderStroke(0.5.dp, Color(0x22FFFFFF)),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Column(modifier = Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                    Text(text = "اسم المنشأة: بيت الضيافة التراثي - حراز", fontWeight = FontWeight.Bold, fontSize = 11.sp, color = Color.White)
+                    Text(text = "معدل الإشغال: 80%", color = Color(0xFF34D399), fontWeight = FontWeight.Bold, fontSize = 11.sp)
+                }
+                Text(text = "• الغرفة 102: مأهولة (السائح أحمد حامد) - حجز مؤكد", fontSize = 10.sp, color = Color(0xFFE2E8F0))
+                Text(text = "• الغرفة 105: مأهولة (م. رغد) - حجز مؤكد", fontSize = 10.sp, color = Color(0xFFE2E8F0))
+                Text(text = "• الغرفة 108: شاغرة - جاهزة للاستقبال", fontSize = 10.sp, color = Color(0xFF94A3B8))
+            }
+        }
+    }
+}
+
+@Composable
+fun LocalGuidesPortalVisual() {
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(text = "لوحة تحكم المرشدين المحليين الأخصائيين", fontWeight = FontWeight.Bold, color = Color(0xFFA855F7), fontSize = 12.sp)
+        Text(text = "بوابة مخصصة للمرشدين مثل 'مصلح الحرازي' لمشاهدة مسار السير البري وتفاصيل الرحلة:", fontSize = 11.sp, color = Color(0xFFE2E8F0))
+
+        Card(
+            colors = CardDefaults.cardColors(containerColor = Color(0x0FFFFFFF)),
+            border = BorderStroke(0.5.dp, Color(0x22FFFFFF)),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Row(modifier = Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
+                Icon(imageVector = Icons.Default.Map, contentDescription = "Map", tint = Color(0xFFA855F7), modifier = Modifier.size(32.dp))
+                Spacer(modifier = Modifier.width(12.dp))
+                Column {
+                    Text(text = "المرشد النشط: مصلح الحرازي", fontWeight = FontWeight.Bold, fontSize = 11.sp, color = Color.White)
+                    Text(text = "الرحلة الحالية: قطف البن الخولاني التراثي", fontSize = 10.sp, color = Color(0xFFE2E8F0))
+                    Text(text = "موقع التجمع: عقبة حراز، 09:00 صباحاً", fontSize = 9.sp, color = Color(0xFF94A3B8))
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun SupportDeskPortalVisual() {
+    var ticketText by remember { mutableStateOf("") }
+    var resultMsg by remember { mutableStateOf("") }
+    
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(text = "لوحة تحكم الدعم الفني ومعالجة البلاغات", fontWeight = FontWeight.Bold, color = Color(0xFFE11D48), fontSize = 12.sp)
+        Text(text = "تواصل مباشر مع الدعم الفني لمنصة تِجربة لمعالجة أي مشاكل دفع أو تعديل في حجز الرحلات الثقافية:", fontSize = 11.sp, color = Color(0xFFE2E8F0))
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            OutlinedTextField(
+                value = ticketText,
+                onValueChange = { ticketText = it },
+                placeholder = { Text("اكتب مشكلتك هنا لإرسال بلاغ فوري...", fontSize = 11.sp) },
+                modifier = Modifier.weight(1f),
+                shape = RoundedCornerShape(10.dp),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = Color(0xFFE11D48),
+                    unfocusedBorderColor = Color(0x22FFFFFF),
+                    focusedTextColor = Color.White,
+                    unfocusedTextColor = Color.White
+                )
+            )
+            Button(
+                onClick = {
+                    if (ticketText.trim().isNotEmpty()) {
+                        resultMsg = "تم فتح تذكرة دعم فني برقم #${(10000..99999).random()}! سيقوم مهندسونا بالتواصل معك فوراً."
+                        ticketText = ""
+                    }
+                },
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE11D48)),
+                shape = RoundedCornerShape(10.dp)
+            ) {
+                Text(text = "إرسال", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 11.sp)
+            }
+        }
+
+        if (resultMsg.isNotEmpty()) {
+            Text(text = resultMsg, color = Color(0xFF34D399), fontSize = 10.sp, fontWeight = FontWeight.Bold)
+        }
+    }
+}
+
+@Composable
+fun ArParallaxMockSimulator() {
+    var offsetX by remember { mutableStateOf(0f) }
+    var offsetY by remember { mutableStateOf(0f) }
+    
+    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        Text(text = "🔮 محاكي الواقع المعزز واستعراض المعالم (AR Tour Preview)", fontWeight = FontWeight.Bold, color = Color(0xFFC59B27), fontSize = 14.sp)
+        Text(text = "يتيح هذا النظام للسياح تصفح معالم اليمن التراثية (مثل باب اليمن، قلعة صيرة) بتقنية الواقع المعزز ثلاثي الأبعاد مباشرة قبل الحجز. حرك إصبعك على البطاقة أدناه لمحاكاة التأثير البصري ثلاثي الأبعاد ثلاثي الأبعاد:", fontSize = 11.sp, color = Color(0xFF94A3B8))
+
+        Spacer(modifier = Modifier.height(4.dp))
+
+        // Simulated AR parallax card
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(160.dp)
+                .background(Color(0x0FFFFFFF), RoundedCornerShape(20.dp))
+                .border(1.dp, Color(0xFFC59B27).copy(alpha = 0.5f), RoundedCornerShape(20.dp))
+                .pointerInput(Unit) {
+                    detectDragGestures { change, dragAmount ->
+                        change.consume()
+                        offsetX = (offsetX + dragAmount.x / 10f).coerceIn(-30f, 30f)
+                        offsetY = (offsetY + dragAmount.y / 10f).coerceIn(-20f, 20f)
+                    }
+                },
+            contentAlignment = Alignment.Center
+        ) {
+            // Layer 1 (Background Glow)
+            Box(
+                modifier = Modifier
+                    .size(100.dp)
+                    .offset(x = (offsetX * 0.4f).dp, y = (offsetY * 0.4f).dp)
+                    .background(Color(0xFFC59B27).copy(alpha = 0.15f), CircleShape)
+            )
+
+            // Layer 2 (Middle Gate outline / text)
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier
+                    .offset(x = (offsetX * 0.8f).dp, y = (offsetY * 0.8f).dp)
+                    .border(2.dp, Color(0xFFC59B27), RoundedCornerShape(12.dp))
+                    .background(Color.Black.copy(alpha = 0.6f))
+                    .padding(14.dp)
+            ) {
+                Text(text = "🏛️ باب اليمن الأثري (باب صنعاء)", fontWeight = FontWeight.Bold, color = Color(0xFFC59B27), fontSize = 12.sp)
+                Text(text = "صنعاء القديمة - تراث عالمي لليونسكو", fontSize = 9.sp, color = Color(0xFFE2E8F0))
+            }
+
+            // Layer 3 (Foreground Floating camera / scan overlay)
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(8.dp),
+                contentAlignment = Alignment.TopStart
+            ) {
+                Text(text = "📷 نمط استعراض AR نشط (AR 3D Preview Active)", color = Color(0xFF34D399), fontSize = 9.sp, fontWeight = FontWeight.Bold)
+            }
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(8.dp),
+                contentAlignment = Alignment.BottomEnd
+            ) {
+                Text(text = "حرك إصبعك لتغيير المنظور", color = Color(0xFF94A3B8), fontSize = 9.sp)
+            }
+        }
+    }
 }
 
