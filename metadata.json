@@ -1,0 +1,6 @@
+{
+  "name": "Tajrubah",
+  "description": "Tajrubah is Yemen's first smart platform for authentic local experiences and travel planning powered by Gemini AI.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
