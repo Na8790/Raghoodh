@@ -73,6 +73,10 @@ fun TajrubahApp(viewModel: TajrubahViewModel) {
         OnboardingScreen(onStart = { viewModel.navigateTo(Screen.Home) })
     } else {
         Scaffold(
+            containerColor = Color.Transparent,
+            modifier = Modifier
+                .fillMaxSize()
+                .frostedGlassBackground(),
             topBar = {
                 TopAppBar(
                     title = {
@@ -91,7 +95,7 @@ fun TajrubahApp(viewModel: TajrubahViewModel) {
                         )
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.background,
+                        containerColor = Color.Transparent,
                         titleContentColor = MaterialTheme.colorScheme.primary
                     )
                 )
@@ -108,7 +112,6 @@ fun TajrubahApp(viewModel: TajrubahViewModel) {
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(innerPadding)
-                    .background(MaterialTheme.colorScheme.background)
             ) {
                 AnimatedContent(
                     targetState = currentScreen,
@@ -142,11 +145,7 @@ fun OnboardingScreen(onStart: () -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(
-                brush = Brush.verticalGradient(
-                    colors = listOf(Color(0xFF132A15), Color(0xFF13110E))
-                )
-            )
+            .frostedGlassBackground()
             .padding(24.dp),
         contentAlignment = Alignment.Center
     ) {
@@ -206,10 +205,10 @@ fun OnboardingScreen(onStart: () -> Unit) {
             // Glassmorphic intro description card
             Card(
                 colors = CardDefaults.cardColors(
-                    containerColor = Color(0xFF27211C).copy(alpha = 0.8f)
+                    containerColor = Color(0x1BFFFFFF)
                 ),
-                shape = RoundedCornerShape(16.dp),
-                border = BorderStroke(1.dp, Color(0xFFC59B27).copy(alpha = 0.3f)),
+                shape = RoundedCornerShape(24.dp),
+                border = BorderStroke(1.dp, Color(0x33FFFFFF)),
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 8.dp)
@@ -353,39 +352,59 @@ fun TajrubahBottomNavigation(
     currentScreen: Screen,
     onNavigate: (Screen) -> Unit
 ) {
+    val navItemColors = NavigationBarItemDefaults.colors(
+        selectedIconColor = Color(0xFFC59B27),
+        selectedTextColor = Color(0xFFC59B27),
+        indicatorColor = Color(0x33C59B27),
+        unselectedIconColor = Color(0xFF94A3B8),
+        unselectedTextColor = Color(0xFF94A3B8)
+    )
+
     NavigationBar(
-        containerColor = MaterialTheme.colorScheme.surface,
-        tonalElevation = 8.dp
+        containerColor = Color(0x3D080B14), // Glass dark obsidian
+        tonalElevation = 0.dp,
+        modifier = Modifier.border(
+            width = 1.dp,
+            brush = Brush.verticalGradient(
+                colors = listOf(Color(0x33FFFFFF), Color.Transparent)
+            ),
+            shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp)
+        )
     ) {
         NavigationBarItem(
             selected = currentScreen is Screen.Home,
             onClick = { onNavigate(Screen.Home) },
             icon = { Icon(imageVector = Icons.Default.Explore, contentDescription = "Home") },
-            label = { Text("استكشاف", fontSize = 11.sp) }
+            label = { Text("استكشاف", fontSize = 11.sp) },
+            colors = navItemColors
         )
         NavigationBarItem(
             selected = currentScreen is Screen.AiPlanner,
             onClick = { onNavigate(Screen.AiPlanner) },
             icon = { Icon(imageVector = Icons.Default.AutoAwesome, contentDescription = "Planner") },
-            label = { Text("مخطط الذكاء", fontSize = 11.sp) }
+            label = { Text("مخطط الذكاء", fontSize = 11.sp) },
+            colors = navItemColors
         )
         NavigationBarItem(
             selected = currentScreen is Screen.AiGuideChat,
             onClick = { onNavigate(Screen.AiGuideChat) },
             icon = { Icon(imageVector = Icons.AutoMirrored.Filled.Chat, contentDescription = "Chat") },
-            label = { Text("المرشد الذكي", fontSize = 11.sp) }
+            label = { Text("المرشد الذكي", fontSize = 11.sp) },
+            colors = navItemColors
         )
         NavigationBarItem(
             selected = currentScreen is Screen.Bookings,
             onClick = { onNavigate(Screen.Bookings) },
             icon = { Icon(imageVector = Icons.Default.ConfirmationNumber, contentDescription = "Tickets") },
-            label = { Text("تذاكري", fontSize = 11.sp) }
+            label = { Text("تذاكري", fontSize = 11.sp) },
+            colors = navItemColors
         )
         NavigationBarItem(
             selected = currentScreen is Screen.Wallet || currentScreen is Screen.Dashboard,
             onClick = { onNavigate(Screen.Wallet) },
             icon = { Icon(imageVector = Icons.Default.AccountBalanceWallet, contentDescription = "Wallet") },
-            label = { Text("المحفظة", fontSize = 11.sp) }
+            label = { Text("المحفظة", fontSize = 11.sp) },
+            colors = navItemColors
         )
     }
 }
@@ -479,10 +498,14 @@ fun TouristHomeView(viewModel: TajrubahViewModel) {
                         .weight(1f)
                         .testTag("search_field"),
                     shape = RoundedCornerShape(12.dp),
-                    leadingIcon = { Icon(imageVector = Icons.Default.Search, contentDescription = "Search") },
+                    leadingIcon = { Icon(imageVector = Icons.Default.Search, contentDescription = "Search", tint = Color(0xFF94A3B8)) },
                     colors = OutlinedTextFieldDefaults.colors(
+                        focusedContainerColor = Color(0x1AFFFFFF),
+                        unfocusedContainerColor = Color(0x0FFFFFFF),
                         focusedBorderColor = MaterialTheme.colorScheme.primary,
-                        unfocusedBorderColor = MaterialTheme.colorScheme.surface
+                        unfocusedBorderColor = Color(0x22FFFFFF),
+                        focusedTextColor = Color.White,
+                        unfocusedTextColor = Color(0xFFE2E8F0)
                     ),
                     singleLine = true
                 )
@@ -498,7 +521,7 @@ fun TouristHomeView(viewModel: TajrubahViewModel) {
                     Icon(
                         imageVector = Icons.Default.HelpOutline,
                         contentDescription = "تجربة على البركة (Surprise)",
-                        tint = MaterialTheme.colorScheme.onPrimary,
+                        tint = Color.Black,
                         modifier = Modifier.size(24.dp)
                     )
                 }
@@ -539,10 +562,20 @@ fun TouristHomeView(viewModel: TajrubahViewModel) {
                     FilterChip(
                         selected = selectedCategory == category,
                         onClick = { selectedCategory = category },
-                        label = { Text(text = category) },
+                        label = { Text(text = category, fontWeight = FontWeight.Medium) },
                         colors = FilterChipDefaults.filterChipColors(
                             selectedContainerColor = MaterialTheme.colorScheme.primary,
-                            selectedLabelColor = MaterialTheme.colorScheme.onPrimary
+                            selectedLabelColor = Color.Black,
+                            containerColor = Color(0x14FFFFFF),
+                            labelColor = Color(0xFFE2E8F0)
+                        ),
+                        border = FilterChipDefaults.filterChipBorder(
+                            enabled = true,
+                            selected = selectedCategory == category,
+                            selectedBorderColor = Color.Transparent,
+                            borderColor = Color(0x1AFFFFFF),
+                            selectedBorderWidth = 0.dp,
+                            borderWidth = 1.dp
                         ),
                         shape = RoundedCornerShape(20.dp)
                     )
@@ -697,8 +730,10 @@ fun ExperienceFeedCard(
             .fillMaxWidth()
             .clickable(onClick = onClick)
             .testTag("experience_card_${experience.id}"),
-        shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+        shape = RoundedCornerShape(16.dp),
+        border = BorderStroke(1.dp, Color(0x22FFFFFF)),
+        colors = CardDefaults.cardColors(containerColor = Color(0x11FFFFFF)),
+        elevation = CardDefaults.cardElevation(0.dp)
     ) {
         Row(
             modifier = Modifier
@@ -1114,10 +1149,10 @@ fun BookingAddonToggle(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 6.dp)
-            .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.5f), RoundedCornerShape(8.dp))
-            .border(0.5.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.2f), RoundedCornerShape(8.dp))
+            .background(Color(0x13FFFFFF), RoundedCornerShape(12.dp))
+            .border(1.dp, if (checked) MaterialTheme.colorScheme.primary else Color(0x1AFFFFFF), RoundedCornerShape(12.dp))
             .clickable { onCheckedChange(!checked) }
-            .padding(10.dp),
+            .padding(12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Column(modifier = Modifier.weight(1f)) {
@@ -2005,8 +2040,9 @@ fun BoardingPassTicketCard(booking: BookingEntity) {
             .fillMaxWidth()
             .testTag("ticket_${booking.bookingId}"),
         shape = RoundedCornerShape(16.dp),
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.3f)),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+        border = BorderStroke(1.dp, Color(0x33FFFFFF)),
+        colors = CardDefaults.cardColors(containerColor = Color(0x1AFFFFFF)),
+        elevation = CardDefaults.cardElevation(0.dp)
     ) {
         Column(modifier = Modifier.fillMaxWidth()) {
             // Upper Ticket portion
@@ -2016,8 +2052,8 @@ fun BoardingPassTicketCard(booking: BookingEntity) {
                     .background(
                         brush = Brush.verticalGradient(
                             colors = listOf(
-                                MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
-                                MaterialTheme.colorScheme.surface
+                                Color(0x14FFFFFF),
+                                Color.Transparent
                             )
                         )
                     )
@@ -2469,3 +2505,47 @@ fun AnalyticsCard(title: String, counter: String, modifier: Modifier) {
         }
     }
 }
+
+// --- FROSTED GLASS MESH GRADIENT MODIFIER ---
+fun Modifier.frostedGlassBackground(): Modifier = this.drawBehind {
+    val width = size.width
+    val height = size.height
+
+    // 1. Draw solid deep obsidian dark base
+    drawRect(color = Color(0xFF080B14))
+
+    // 2. Draw Glow Backdrops (Mesh Gradient Blobs)
+    // Top-left Amber/Orange glow blob (80dp-like radius)
+    drawCircle(
+        brush = Brush.radialGradient(
+            colors = listOf(Color(0xFFD97706).copy(alpha = 0.22f), Color.Transparent),
+            center = Offset(-width * 0.15f, -height * 0.05f),
+            radius = width * 0.8f
+        ),
+        center = Offset(-width * 0.15f, -height * 0.05f),
+        radius = width * 0.8f
+    )
+
+    // Center-left/middle Purple glow blob
+    drawCircle(
+        brush = Brush.radialGradient(
+            colors = listOf(Color(0xFF9333EA).copy(alpha = 0.15f), Color.Transparent),
+            center = Offset(width * 0.1f, height * 0.45f),
+            radius = width * 0.55f
+        ),
+        center = Offset(width * 0.1f, height * 0.45f),
+        radius = width * 0.55f
+    )
+
+    // Bottom-right Teal glow blob (100dp-like radius)
+    drawCircle(
+        brush = Brush.radialGradient(
+            colors = listOf(Color(0xFF0D9488).copy(alpha = 0.18f), Color.Transparent),
+            center = Offset(width * 1.15f, height * 0.8f),
+            radius = width * 0.9f
+        ),
+        center = Offset(width * 1.15f, height * 0.8f),
+        radius = width * 0.9f
+    )
+}
+

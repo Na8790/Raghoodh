@@ -21,7 +21,7 @@ private val DarkColorScheme =
     onSecondary = OnDarkText,
     onTertiary = CosmicCharcoal,
     onBackground = OnDarkText,
-    onSurface = OnDarkText
+    onSurface = OnDarkSurface
   )
 
 private val LightColorScheme =
