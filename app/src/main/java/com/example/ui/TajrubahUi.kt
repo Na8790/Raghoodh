@@ -2889,6 +2889,16 @@ fun DocumentationBookView() {
             content = { ChapterEightContent() }
         ),
         ChapterData(
+            title = "الفصل التاسع: مخطط الفئات (Class Diagram)",
+            icon = Icons.Default.AccountTree,
+            content = { ChapterNineContent() }
+        ),
+        ChapterData(
+            title = "الفصل الحادي والعشرون: تصميم واجهات الـ API (REST API Design)",
+            icon = Icons.Default.Code,
+            content = { ChapterTwentyOneContent() }
+        ),
+        ChapterData(
             title = "ملحق حالات الاستخدام التفصيلية (UC-007 إلى UC-020)",
             icon = Icons.Default.AssignmentTurnedIn,
             content = { UseCasesContent() }
@@ -4086,4 +4096,1212 @@ fun ArParallaxMockSimulator() {
         }
     }
 }
+
+// =========================================================================
+// CHAPTER 9: CLASS DIAGRAM & ACADEMIC UML SPECIFICATION
+// =========================================================================
+@Composable
+fun ChapterNineContent() {
+    var selectedSubTab by remember { mutableStateOf(0) }
+    val subTabs = listOf(
+        "البنية الأساسية",
+        "الحجوزات والمالية",
+        "الذكاء الاصطناعي",
+        "الإدارة والتحكم",
+        "العلاقات والمبادئ"
+    )
+
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Text(
+            text = "📊 مخطط الفئات (Class Diagram) لمنصة تِجربة",
+            fontWeight = FontWeight.Bold,
+            color = Color(0xFFC59B27),
+            fontSize = 14.sp
+        )
+        Text(
+            text = "تصميم الفئات الكائنية (Object-Oriented Structure) المعتمد في منصة تِجربة وفق مبادئ SOLID و Clean Architecture لضمان سهولة التطوير والصيانة وقابلية التوسع.",
+            fontSize = 11.sp,
+            color = Color(0xFF94A3B8)
+        )
+
+        LazyRow(
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            items(subTabs.size) { index ->
+                Box(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(if (selectedSubTab == index) Color(0xFFC59B27) else Color(0x13FFFFFF))
+                        .clickable { selectedSubTab = index }
+                        .padding(horizontal = 12.dp, vertical = 6.dp)
+                ) {
+                    Text(
+                        text = subTabs[index],
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = if (selectedSubTab == index) Color.Black else Color.White
+                    )
+                }
+            }
+        }
+
+        Divider(color = Color(0x1AFFFFFF), modifier = Modifier.padding(vertical = 4.dp))
+
+        when (selectedSubTab) {
+            0 -> CoreClassesTab()
+            1 -> BookingPaymentTab()
+            2 -> AIRecommendationTab()
+            3 -> AdminDashboardTab()
+            4 -> RelationsOopTab()
+        }
+    }
+}
+
+@Composable
+fun ClassDiagramBlock(
+    className: String,
+    isInterface: Boolean = false,
+    attributes: List<String>,
+    methods: List<String>
+) {
+    Card(
+        colors = CardDefaults.cardColors(containerColor = Color(0x0FFFFFFF)),
+        border = BorderStroke(1.dp, if (isInterface) Color(0xFFA855F7).copy(alpha = 0.5f) else Color(0xFFC59B27).copy(alpha = 0.4f)),
+        shape = RoundedCornerShape(12.dp),
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Column(modifier = Modifier.fillMaxWidth()) {
+            // Header
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(if (isInterface) Color(0xFFA855F7).copy(alpha = 0.15f) else Color(0xFFC59B27).copy(alpha = 0.15f))
+                    .padding(10.dp)
+            ) {
+                Column {
+                    if (isInterface) {
+                        Text(
+                            text = "<<Interface>>",
+                            fontSize = 8.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color(0xFFA855F7),
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(
+                            text = className,
+                            fontWeight = FontWeight.Bold,
+                            color = if (isInterface) Color(0xFFA855F7) else Color(0xFFC59B27),
+                            fontSize = 12.sp,
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                }
+            }
+            
+            // Attributes section
+            Column(modifier = Modifier.padding(10.dp)) {
+                if (attributes.isNotEmpty()) {
+                    Text(
+                        text = "Attributes (الخصائص):",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 10.sp,
+                        color = Color(0xFF38BDF8)
+                    )
+                    attributes.forEach { attr ->
+                        Text(
+                            text = attr,
+                            fontSize = 9.sp,
+                            color = Color(0xFFE2E8F0),
+                            modifier = Modifier.padding(start = 6.dp, top = 1.dp, bottom = 1.dp)
+                        )
+                    }
+                }
+                
+                if (attributes.isNotEmpty() && methods.isNotEmpty()) {
+                    Divider(
+                        color = Color(0x1AFFFFFF),
+                        modifier = Modifier.padding(vertical = 8.dp)
+                    )
+                }
+                
+                if (methods.isNotEmpty()) {
+                    Text(
+                        text = "Methods (العمليات):",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 10.sp,
+                        color = Color(0xFF34D399)
+                    )
+                    methods.forEach { method ->
+                        Text(
+                            text = method,
+                            fontSize = 9.sp,
+                            color = Color(0xFFE2E8F0),
+                            modifier = Modifier.padding(start = 6.dp, top = 1.dp, bottom = 1.dp)
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun InteractiveClassList(classes: List<Pair<String, Pair<List<String>, List<String>>>>, isInterface: Boolean = false) {
+    var expandedClassIndex by remember { mutableStateOf<Int?>(null) }
+    
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        classes.forEachIndexed { index, item ->
+            val isExpanded = expandedClassIndex == index
+            Card(
+                colors = CardDefaults.cardColors(containerColor = Color(0x0AFFFFFF)),
+                border = BorderStroke(1.dp, if (isExpanded) Color(0xFFC59B27) else Color(0x11FFFFFF)),
+                shape = RoundedCornerShape(10.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { expandedClassIndex = if (isExpanded) null else index }
+                            .padding(12.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(
+                                text = if (isInterface) "⚙️ Interface: " else "📦 Class: ",
+                                fontSize = 10.sp,
+                                color = if (isInterface) Color(0xFFA855F7) else Color(0xFFC59B27),
+                                fontWeight = FontWeight.Bold
+                            )
+                            Text(
+                                text = item.first,
+                                fontWeight = FontWeight.Bold,
+                                color = Color.White,
+                                fontSize = 12.sp
+                            )
+                        }
+                        Text(
+                            text = if (isExpanded) "إغلاق ❌" else "عرض التفاصيل 🔍",
+                            fontSize = 10.sp,
+                            color = Color(0xFF94A3B8)
+                        )
+                    }
+                    if (isExpanded) {
+                        Divider(color = Color(0x1AFFFFFF))
+                        Box(modifier = Modifier.padding(10.dp)) {
+                            ClassDiagramBlock(
+                                className = item.first,
+                                isInterface = isInterface,
+                                attributes = item.second.first,
+                                methods = item.second.second
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun CoreClassesTab() {
+    val coreClasses = listOf(
+        "User" to (listOf(
+            "+ userId : UUID",
+            "+ fullName : String",
+            "+ email : String",
+            "+ phone : String",
+            "+ passwordHash : String",
+            "+ profileImage : String",
+            "+ gender : Enum",
+            "+ birthDate : Date",
+            "+ language : String",
+            "+ status : UserStatus",
+            "+ createdAt : DateTime",
+            "+ updatedAt : DateTime"
+        ) to listOf(
+            "+ register()",
+            "+ login()",
+            "+ logout()",
+            "+ updateProfile()",
+            "+ changePassword()",
+            "+ verifyOTP()"
+        )),
+        "Role" to (listOf(
+            "+ roleId : UUID",
+            "+ roleName : String",
+            "+ description : String"
+        ) to listOf(
+            "+ assignRole()",
+            "+ removeRole()"
+        )),
+        "Permission" to (listOf(
+            "+ permissionId : UUID",
+            "+ permissionName : String",
+            "+ module : String"
+        ) to listOf(
+            "+ grantPermission()",
+            "+ revokePermission()"
+        )),
+        "Experience" to (listOf(
+            "+ experienceId : UUID",
+            "+ title : String",
+            "+ description : String",
+            "+ location : Geography",
+            "+ price : Decimal",
+            "+ duration : Integer",
+            "+ capacity : Integer",
+            "+ status : Enum",
+            "+ averageRating : Float"
+        ) to listOf(
+            "+ publish()",
+            "+ update()",
+            "+ delete()",
+            "+ calculateRating()",
+            "+ checkAvailability()"
+        )),
+        "Category" to (listOf(
+            "+ categoryId : UUID",
+            "+ name : String",
+            "+ icon : String"
+        ) to listOf(
+            "+ createCategory()",
+            "+ updateCategory()"
+        )),
+        "Booking" to (listOf(
+            "+ bookingId : UUID",
+            "+ bookingDate : Date",
+            "+ status : Enum",
+            "+ totalPrice : Decimal",
+            "+ paymentStatus : Enum",
+            "+ qrCode : String"
+        ) to listOf(
+            "+ createBooking()",
+            "+ cancelBooking()",
+            "+ confirmBooking()",
+            "+ completeBooking()"
+        )),
+        "Payment" to (listOf(
+            "+ paymentId : UUID",
+            "+ amount : Decimal",
+            "+ paymentMethod : Enum",
+            "+ transactionId : String",
+            "+ paymentStatus : Enum",
+            "+ paidAt : DateTime"
+        ) to listOf(
+            "+ processPayment()",
+            "+ refund()",
+            "+ generateReceipt()"
+        )),
+        "Review" to (listOf(
+            "+ reviewId : UUID",
+            "+ rating : Integer",
+            "+ comment : String",
+            "+ createdAt : DateTime"
+        ) to listOf(
+            "+ addReview()",
+            "+ editReview()",
+            "+ deleteReview()"
+        ))
+    )
+
+    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        Text(
+            text = "🏰 9.2 الفئات الأساسية في منصة تِجربة (Core Classes)",
+            fontWeight = FontWeight.Bold,
+            color = Color(0xFFC59B27),
+            fontSize = 13.sp
+        )
+        Text(
+            text = "انقر على أي فئة (Class) لاستعراض خصائصها وعملياتها بالتفصيل البرمجي والنمذجة الكائنية:",
+            fontSize = 11.sp,
+            color = Color(0xFFE2E8F0)
+        )
+        InteractiveClassList(classes = coreClasses)
+    }
+}
+
+@Composable
+fun BookingPaymentTab() {
+    val bookingPaymentClasses = listOf(
+        "Booking" to (listOf(
+            "+ bookingId : UUID",
+            "+ userId : UUID",
+            "+ serviceId : UUID",
+            "+ serviceType : Enum",
+            "+ bookingDate : Date",
+            "+ startDate : DateTime",
+            "+ endDate : DateTime",
+            "+ numberOfPeople : Integer",
+            "+ totalAmount : Decimal",
+            "+ bookingStatus : Enum",
+            "+ createdAt : DateTime"
+        ) to listOf(
+            "+ createBooking()",
+            "+ validateBooking()",
+            "+ confirmBooking()",
+            "+ cancelBooking()",
+            "+ modifyBooking()",
+            "+ calculateTotal()",
+            "+ updateStatus()"
+        )),
+        "BookingItem" to (listOf(
+            "+ itemId : UUID",
+            "+ bookingId : UUID",
+            "+ serviceId : UUID",
+            "+ quantity : Integer",
+            "+ price : Decimal"
+        ) to listOf(
+            "+ addItem()",
+            "+ removeItem()",
+            "+ calculatePrice()"
+        )),
+        "AvailabilityChecker" to (listOf(
+            "+ serviceId : UUID",
+            "+ requestedDate : Date",
+            "+ capacity : Integer"
+        ) to listOf(
+            "+ checkAvailability()",
+            "+ reserveSlot()",
+            "+ releaseSlot()"
+        )),
+        "Payment" to (listOf(
+            "+ paymentId : UUID",
+            "+ bookingId : UUID",
+            "+ amount : Decimal",
+            "+ currency : String",
+            "+ paymentMethod : Enum",
+            "+ transactionId : String",
+            "+ status : PaymentStatus",
+            "+ paymentDate : DateTime"
+        ) to listOf(
+            "+ initiatePayment()",
+            "+ verifyPayment()",
+            "+ completePayment()",
+            "+ refundPayment()"
+        )),
+        "Invoice" to (listOf(
+            "+ invoiceId : UUID",
+            "+ bookingId : UUID",
+            "+ invoiceNumber : String",
+            "+ amount : Decimal",
+            "+ tax : Decimal",
+            "+ createdDate : DateTime"
+        ) to listOf(
+            "+ generateInvoice()",
+            "+ downloadPDF()",
+            "+ sendInvoice()"
+        )),
+        "Commission" to (listOf(
+            "+ commissionId : UUID",
+            "+ providerId : UUID",
+            "+ bookingId : UUID",
+            "+ percentage : Float",
+            "+ amount : Decimal"
+        ) to listOf(
+            "+ calculateCommission()",
+            "+ applyCommission()"
+        )),
+        "Wallet" to (listOf(
+            "+ walletId : UUID",
+            "+ providerId : UUID",
+            "+ balance : Decimal",
+            "+ currency : String"
+        ) to listOf(
+            "+ addBalance()",
+            "+ withdraw()",
+            "+ getBalance()"
+        )),
+        "Withdrawal" to (listOf(
+            "+ withdrawalId : UUID",
+            "+ walletId : UUID",
+            "+ amount : Decimal",
+            "+ status : Enum",
+            "+ requestDate : Date"
+        ) to listOf(
+            "+ requestWithdrawal()",
+            "+ approveWithdrawal()",
+            "+ rejectWithdrawal()"
+        ))
+    )
+
+    val paymentInterfaces = listOf(
+        "PaymentGateway" to (emptyList<String>() to listOf(
+            "+ pay()",
+            "+ verifyTransaction()",
+            "+ refund()"
+        ))
+    )
+
+    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        Text(
+            text = "💰 9.11 وحدة الحجوزات والمدفوعات (Booking & Payment Module)",
+            fontWeight = FontWeight.Bold,
+            color = Color(0xFFC59B27),
+            fontSize = 13.sp
+        )
+        Text(
+            text = "تمثل هذه الفئات دورة المعاملات المالية والحجوزات الآمنة، بدءاً من حجز الخدمة، مروراً بالدفع وتحديث المحافظ وحساب العمولات:",
+            fontSize = 11.sp,
+            color = Color(0xFF94A3B8)
+        )
+        
+        Text(
+            text = "🔌 الواجهات (Interfaces):",
+            fontWeight = FontWeight.Bold,
+            color = Color(0xFFA855F7),
+            fontSize = 11.sp
+        )
+        InteractiveClassList(classes = paymentInterfaces, isInterface = true)
+        
+        Spacer(modifier = Modifier.height(4.dp))
+        
+        Text(
+            text = "📦 فئات الوحدة (Classes):",
+            fontWeight = FontWeight.Bold,
+            color = Color(0xFFC59B27),
+            fontSize = 11.sp
+        )
+        InteractiveClassList(classes = bookingPaymentClasses)
+        
+        Divider(color = Color(0x1AFFFFFF), modifier = Modifier.padding(vertical = 4.dp))
+        
+        Text(
+            text = "🔄 سيناريو العمل المالي (Conceptual Workflow):",
+            fontWeight = FontWeight.Bold,
+            color = Color(0xFF38BDF8),
+            fontSize = 12.sp
+        )
+        Text(
+            text = "1. السائح يختار تجربة ➜ يقوم الـ AvailabilityChecker بالتحقق من توفر الموعد والسعة.\n2. يتم إنشاء الـ Booking في حالة معلقة.\n3. ينتقل السائح لصفحة الدفع ➜ معالجة العملية عبر الـ PaymentGateway.\n4. عند نجاح الدفع ➜ تحديث حالة الحجز (Paid)، توليد الفاتورة إلكترونياً (Invoice)، وتوليد رمز الحجز QR Code.\n5. يتم حساب عمولة المنصة تلقائياً (Commission) بنسبة 10%، وإضافة صافي الربح لمحفظة مقدم الخدمة (Wallet).",
+            fontSize = 11.sp,
+            color = Color(0xFFE2E8F0),
+            lineHeight = 15.sp
+        )
+    }
+}
+
+@Composable
+fun AIRecommendationTab() {
+    val aiClasses = listOf(
+        "AI Assistant" to (listOf(
+            "+ assistantId : UUID",
+            "+ userId : UUID",
+            "+ conversationId : UUID",
+            "+ language : String",
+            "+ status : Enum"
+        ) to listOf(
+            "+ startConversation()",
+            "+ analyzeRequest()",
+            "+ generateResponse()",
+            "+ suggestTrip()",
+            "+ answerQuestions()"
+        )),
+        "SmartTripGenerator" to (listOf(
+            "+ tripGeneratorId : UUID",
+            "+ budget : Decimal",
+            "+ duration : Integer",
+            "+ destination : String",
+            "+ travelersCount : Integer"
+        ) to listOf(
+            "+ createTripPlan()",
+            "+ calculateBudget()",
+            "+ selectExperiences()",
+            "+ selectHotels()",
+            "+ selectTransportation()",
+            "+ optimizeTrip()"
+        )),
+        "RecommendationEngine" to (listOf(
+            "+ recommendationId : UUID",
+            "+ userId : UUID",
+            "+ algorithmType : String",
+            "+ confidenceScore : Float"
+        ) to listOf(
+            "+ generateRecommendations()",
+            "+ rankResults()",
+            "+ personalizeResults()",
+            "+ updateModel()"
+        )),
+        "UserProfileAnalyzer" to (listOf(
+            "+ analysisId : UUID",
+            "+ userId : UUID",
+            "+ interests : JSON",
+            "+ preferences : JSON",
+            "+ behaviorScore : Float"
+        ) to listOf(
+            "+ analyzeBehavior()",
+            "+ extractPreferences()",
+            "+ updateProfile()",
+            "+ predictNeeds()"
+        )),
+        "AI Model" to (listOf(
+            "+ modelId : UUID",
+            "+ modelName : String",
+            "+ version : String",
+            "+ accuracy : Float",
+            "+ status : Enum"
+        ) to listOf(
+            "+ trainModel()",
+            "+ testModel()",
+            "+ predict()",
+            "+ improveAccuracy()"
+        )),
+        "RecommendationResult" to (listOf(
+            "+ resultId : UUID",
+            "+ userId : UUID",
+            "+ itemType : Enum",
+            "+ itemId : UUID",
+            "+ score : Float",
+            "+ createdAt : DateTime"
+        ) to listOf(
+            "+ saveResult()",
+            "+ updateScore()",
+            "+ removeResult()"
+        )),
+        "UserPreference" to (listOf(
+            "+ preferenceId : UUID",
+            "+ userId : UUID",
+            "+ preferredActivities : JSON",
+            "+ favoriteLocations : JSON",
+            "+ budgetRange : Decimal"
+        ) to listOf(
+            "+ addPreference()",
+            "+ updatePreference()",
+            "+ removePreference()"
+        )),
+        "TripHistory" to (listOf(
+            "+ historyId : UUID",
+            "+ userId : UUID",
+            "+ tripId : UUID",
+            "+ rating : Integer",
+            "+ completedAt : DateTime"
+        ) to listOf(
+            "+ saveHistory()",
+            "+ analyzeHistory()",
+            "+ getPreviousTrips()"
+        )),
+        "AI Chat Message" to (listOf(
+            "+ messageId : UUID",
+            "+ conversationId : UUID",
+            "+ senderType : Enum",
+            "+ content : Text",
+            "+ createdAt : DateTime"
+        ) to listOf(
+            "+ sendMessage()",
+            "+ receiveMessage()",
+            "+ storeMessage()"
+        ))
+    )
+
+    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        Text(
+            text = "🤖 9.17 وحدة الذكاء الاصطناعي والتوصيات (AI & Recommendation Module)",
+            fontWeight = FontWeight.Bold,
+            color = Color(0xFFC59B27),
+            fontSize = 13.sp
+        )
+        Text(
+            text = "تعد هذه الوحدة قلب الابتكار في منصة تِجربة، حيث تقوم بتحليل بيانات وتفضيلات السياح واقتراح خطط سفر ذكية ومخصصة بالكامل تبرز التراث اليمني الأصيل:",
+            fontSize = 11.sp,
+            color = Color(0xFF94A3B8)
+        )
+        
+        InteractiveClassList(classes = aiClasses)
+        
+        Divider(color = Color(0x1AFFFFFF), modifier = Modifier.padding(vertical = 4.dp))
+        
+        Text(
+            text = "💡 خوارزمية إنشاء الرحلة الذكية (AI Conceptual Workflow):",
+            fontWeight = FontWeight.Bold,
+            color = Color(0xFF34D399),
+            fontSize = 12.sp
+        )
+        Text(
+            text = "عند طلب السائح رحلة محددة (مثل: رحلة لمدة 5 أيام بميزانية 500 دولار):\n1. يقوم الـ AI Assistant باستقبال الطلب وفهمه لغوياً.\n2. يحلل الـ UserProfileAnalyzer اهتمامات السائح وسلوكه.\n3. يقوم الـ SmartTripGenerator بفرز وتوزيع الميزانية وتوليد خطة متكاملة تشمل الأنشطة (Experiences)، الغرف (Hotels) والمواصلات المتاحة.\n4. يرتب الـ RecommendationEngine النتائج ويحسب السعر الإجمالي للخطة.",
+            fontSize = 11.sp,
+            color = Color(0xFFE2E8F0),
+            lineHeight = 15.sp
+        )
+    }
+}
+
+@Composable
+fun AdminDashboardTab() {
+    val adminClasses = listOf(
+        "Admin" to (listOf(
+            "+ adminId : UUID",
+            "+ userId : UUID",
+            "+ department : String",
+            "+ accessLevel : Enum",
+            "+ status : Enum"
+        ) to listOf(
+            "+ loginDashboard()",
+            "+ manageUsers()",
+            "+ manageProviders()",
+            "+ manageSystem()",
+            "+ generateReports()",
+            "+ monitorSystem()"
+        )),
+        "AdminDashboard" to (listOf(
+            "+ dashboardId : UUID",
+            "+ title : String",
+            "+ lastUpdate : DateTime",
+            "+ statistics : JSON"
+        ) to listOf(
+            "+ loadStatistics()",
+            "+ displayKPIs()",
+            "+ exportReport()",
+            "+ refreshData()"
+        )),
+        "UserManagement" to (listOf(
+            "+ managementId : UUID",
+            "+ totalUsers : Integer",
+            "+ activeUsers : Integer",
+            "+ blockedUsers : Integer"
+        ) to listOf(
+            "+ createUser()",
+            "+ updateUser()",
+            "+ deleteUser()",
+            "+ blockUser()",
+            "+ activateUser()",
+            "+ verifyUser()"
+        )),
+        "ProviderManagement" to (listOf(
+            "+ providerManagementId : UUID",
+            "+ verificationStatus : Enum",
+            "+ approvalDate : Date"
+        ) to listOf(
+            "+ approveProvider()",
+            "+ rejectProvider()",
+            "+ suspendProvider()",
+            "+ verifyDocuments()",
+            "+ viewProviderPerformance()"
+        )),
+        "ContentManagement" to (listOf(
+            "+ contentId : UUID",
+            "+ contentType : Enum",
+            "+ status : Enum"
+        ) to listOf(
+            "+ addContent()",
+            "+ editContent()",
+            "+ deleteContent()",
+            "+ approveContent()"
+        )),
+        "ReportManager" to (listOf(
+            "+ reportId : UUID",
+            "+ reportType : Enum",
+            "+ createdDate : DateTime"
+        ) to listOf(
+            "+ generateReport()",
+            "+ exportPDF()",
+            "+ exportExcel()",
+            "+ scheduleReport()"
+        )),
+        "AnalyticsDashboard" to (listOf(
+            "+ analyticsId : UUID",
+            "+ visitorsCount : Integer",
+            "+ bookingsCount : Integer",
+            "+ revenue : Decimal",
+            "+ conversionRate : Float"
+        ) to listOf(
+            "+ calculateKPIs()",
+            "+ analyzeUsers()",
+            "+ analyzeRevenue()",
+            "+ predictGrowth()"
+        )),
+        "SubscriptionManager" to (listOf(
+            "+ subscriptionId : UUID",
+            "+ planName : String",
+            "+ price : Decimal",
+            "+ duration : Integer"
+        ) to listOf(
+            "+ createPlan()",
+            "+ updatePlan()",
+            "+ cancelSubscription()",
+            "+ renewSubscription()"
+        )),
+        "CommissionManager" to (listOf(
+            "+ commissionId : UUID",
+            "+ percentage : Float",
+            "+ totalCommission : Decimal"
+        ) to listOf(
+            "+ calculateCommission()",
+            "+ updateCommissionRate()",
+            "+ generateCommissionReport()"
+        )),
+        "AdvertisementManager" to (listOf(
+            "+ advertisementId : UUID",
+            "+ title : String",
+            "+ startDate : Date",
+            "+ endDate : Date",
+            "+ budget : Decimal"
+        ) to listOf(
+            "+ createAdvertisement()",
+            "+ approveAdvertisement()",
+            "+ stopAdvertisement()",
+            "+ trackPerformance()"
+        )),
+        "AuditLog" to (listOf(
+            "+ logId : UUID",
+            "+ userId : UUID",
+            "+ action : String",
+            "+ ipAddress : String",
+            "+ createdAt : DateTime"
+        ) to listOf(
+            "+ saveLog()",
+            "+ searchLogs()",
+            "+ exportLogs()"
+        )),
+        "SystemSettings" to (listOf(
+            "+ settingId : UUID",
+            "+ key : String",
+            "+ value : String"
+        ) to listOf(
+            "+ updateSetting()",
+            "+ getSetting()",
+            "+ resetSetting()"
+        ))
+    )
+
+    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        Text(
+            text = "🛠️ 9.24 لوحات التحكم والإدارة والرقابة (Admin Dashboard & Management)",
+            fontWeight = FontWeight.Bold,
+            color = Color(0xFFC59B27),
+            fontSize = 13.sp
+        )
+        Text(
+            text = "فئات مخصصة لإدارة العمليات اليومية والمالية لمنصة تِجربة، ومراقبة أداء مقدمي الخدمات والمستخدمين عبر لوحات تحكم ذكية ومؤمنة تماماً:",
+            fontSize = 11.sp,
+            color = Color(0xFF94A3B8)
+        )
+        InteractiveClassList(classes = adminClasses)
+        
+        Divider(color = Color(0x1AFFFFFF), modifier = Modifier.padding(vertical = 4.dp))
+        
+        Text(
+            text = "🔒 الصلاحيات والأمان (RBAC Model):",
+            fontWeight = FontWeight.Bold,
+            color = Color(0xFFE11D48),
+            fontSize = 12.sp
+        )
+        Text(
+            text = "يعتمد النظام على نموذج التحكم بالوصول المستند للأدوار (Role Based Access Control):\n• Administrator (المدير العام): تحكم كامل بجميع الإعدادات والتحليلات والتقارير.\n• Finance Manager (المدير المالي): إدارة المحافظ والعمولات ومطالبات السحب والاشتراكات الفعالة.\n• Support Staff (الدعم الفني): متابعة البلاغات والتذاكر والشكاوى الواردة من المستخدمين.\n• Content Manager (مدير المحتوى): مراجعة وقبول ونشر تفاصيل الأنشطة والتجارب التراثية.",
+            fontSize = 11.sp,
+            color = Color(0xFFE2E8F0),
+            lineHeight = 15.sp
+        )
+    }
+}
+
+@Composable
+fun RelationsOopTab() {
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Text(
+            text = "🔗 9.3 العلاقات بين الكيانات والوراثة والتجميع (UML Relationships)",
+            fontWeight = FontWeight.Bold,
+            color = Color(0xFFC59B27),
+            fontSize = 13.sp
+        )
+        Text(
+            text = "هنا نوضح كيف تترابط فئات النظام كبرمجة كائنية التوجه (OOP) وكيف تم نمذجتها برمجياً وتصميمياً:",
+            fontSize = 11.sp,
+            color = Color(0xFF94A3B8)
+        )
+
+        // Inheritance Block
+        Card(
+            colors = CardDefaults.cardColors(containerColor = Color(0x0FFFFFFF)),
+            border = BorderStroke(1.dp, Color(0xFF38BDF8).copy(alpha = 0.4f)),
+            shape = RoundedCornerShape(12.dp),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Column(modifier = Modifier.padding(12.dp)) {
+                Text(
+                    text = "🧬 9.4 الوراثة (Inheritance):",
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFF38BDF8),
+                    fontSize = 12.sp
+                )
+                Text(
+                    text = "فئة أساسية لمقدم الخدمة (ServiceProvider) تشمل الخصائص المشتركة:\n- providerId | commercialName | license | wallet | rating | status\n\nويرث منها الفئات المتخصصة التالية مع إضافة خصائصها الخاصة:\n- ExperienceProvider (مقدم التجارب)\n- Hotel (الفنادق ودور الضيافة)\n- CarCompany (شركات تأجير السيارات)\n- TourGuide (المرشدين السياحيين)",
+                    fontSize = 11.sp,
+                    color = Color(0xFFE2E8F0),
+                    lineHeight = 14.sp,
+                    modifier = Modifier.padding(top = 4.dp)
+                )
+            }
+        }
+
+        // Composition Block
+        Card(
+            colors = CardDefaults.cardColors(containerColor = Color(0x0FFFFFFF)),
+            border = BorderStroke(1.dp, Color(0xFFF43F5E).copy(alpha = 0.4f)),
+            shape = RoundedCornerShape(12.dp),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Column(modifier = Modifier.padding(12.dp)) {
+                Text(
+                    text = "♦ 9.5 التركيب القوي (Composition):",
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFFF43F5E),
+                    fontSize = 12.sp
+                )
+                Text(
+                    text = "علاقة ارتباط قوية جداً تم تفعيلها برمجياً لضمان التناسق الإتلافي المرجعي:\n- مثال: Hotel ♦──── Room\n- منطق العمل: في حال تم إيقاف أو حذف الفندق من لوحة الإدارة يتم تلقائياً حذف جميع الغرف المرتبطة به في قاعدة البيانات لمنع وجود بيانات يتيمة.",
+                    fontSize = 11.sp,
+                    color = Color(0xFFE2E8F0),
+                    lineHeight = 14.sp,
+                    modifier = Modifier.padding(top = 4.dp)
+                )
+            }
+        }
+
+        // Aggregation Block
+        Card(
+            colors = CardDefaults.cardColors(containerColor = Color(0x0FFFFFFF)),
+            border = BorderStroke(1.dp, Color(0xFF34D399).copy(alpha = 0.4f)),
+            shape = RoundedCornerShape(12.dp),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Column(modifier = Modifier.padding(12.dp)) {
+                Text(
+                    text = "○ 9.6 التجميع المرن (Aggregation):",
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFF34D399),
+                    fontSize = 12.sp
+                )
+                Text(
+                    text = "علاقة ارتباط مرنة بحيث يحتفظ كل عنصر بكيانه المستقل:\n- مثال: Trip ○──── Experience\n- منطق العمل: الرحلة الذكية (Trip) تحتوي وتجمع عدة تجارب (Experience)، ولكن في حال قام السائح بحذف الرحلة من ملفه، تظل التجارب محفوظة في النظام وقابلة للاستكشاف والحجز بشكل مستقل.",
+                    fontSize = 11.sp,
+                    color = Color(0xFFE2E8F0),
+                    lineHeight = 14.sp,
+                    modifier = Modifier.padding(top = 4.dp)
+                )
+            }
+        }
+
+        // Dependency Block
+        Card(
+            colors = CardDefaults.cardColors(containerColor = Color(0x0FFFFFFF)),
+            border = BorderStroke(1.dp, Color(0xFFA855F7).copy(alpha = 0.4f)),
+            shape = RoundedCornerShape(12.dp),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Column(modifier = Modifier.padding(12.dp)) {
+                Text(
+                    text = "⚙️ 9.7 الاعتماد والواجهات (Dependency & Interfaces):",
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFFA855F7),
+                    fontSize = 12.sp
+                )
+                Text(
+                    text = "• الاعتماد (Dependency): يعتمد كائن الحجز (Booking) على الخدمات المساعدة لتنفيذ وظائفه:\n- PaymentService (لتنفيذ بوابات الدفع)\n- NotificationService (لإرسال كود الـ OTP والـ QR Code والتنبيهات)\n- AIRecommendationService (لاقتراح رحلات وتفاصيل دقيقة)\n\n• الواجهات (Interfaces): صُممت الفئات المشتركة كواجهات لتسهيل التطوير واستبدال مزودي الخدمات:\n- IPaymentGateway (Stripe / PayPal وبوابات الدفع اليمنية لاحقاً)\n- INotificationService (Email / SMS / WebPush Notifications)\n- IMapService (Google Maps / OpenStreetMap)",
+                    fontSize = 11.sp,
+                    color = Color(0xFFE2E8F0),
+                    lineHeight = 14.sp,
+                    modifier = Modifier.padding(top = 4.dp)
+                )
+            }
+        }
+    }
+}
+
+// =========================================================================
+// CHAPTER 21: REST API DESIGN & INTERACTIVE CONSOLE
+// =========================================================================
+@Composable
+fun ChapterTwentyOneContent() {
+    var selectedEndpoint by remember { mutableStateOf(0) }
+    var apiResponse by remember { mutableStateOf("") }
+    var isLoading by remember { mutableStateOf(false) }
+    val coroutineScope = rememberCoroutineScope()
+
+    val endpoints = listOf(
+        "POST /auth/login" to ("""
+        {
+          "email": "student@tajrubah.edu",
+          "password": "hashed_password_123"
+        }
+        """.trimIndent() to """
+        {
+          "status": "success",
+          "code": 200,
+          "message": "تم تسجيل الدخول بنجاح",
+          "data": {
+            "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+            "user": {
+              "id": "e30129bc-d931-4b11-b930-b9df72a2e4c2",
+              "name": "م. رغد",
+              "email": "student@tajrubah.edu",
+              "role": "Traveler"
+            }
+          }
+        }
+        """.trimIndent()),
+
+        "GET /experiences" to ("" to """
+        {
+          "status": "success",
+          "code": 200,
+          "data": [
+            {
+              "id": "exp-coffee-01",
+              "titleAr": "قطف البن الخولاني التراثي في مدرجات حراز",
+              "priceYer": 25000,
+              "currency": "YER",
+              "capacity": 15,
+              "rating": 4.9
+            },
+            {
+              "id": "exp-socotra-02",
+              "titleAr": "جولة السير البيئية لوادي ديرهور بـسقطرى",
+              "priceYer": 75000,
+              "currency": "YER",
+              "capacity": 8,
+              "rating": 5.0
+            }
+          ]
+        }
+        """.trimIndent()),
+
+        "POST /bookings/create" to ("""
+        {
+          "experienceId": "exp-coffee-01",
+          "startDate": "2026-07-25T09:00:00Z",
+          "numberOfPeople": 2,
+          "currency": "YER"
+        }
+        """.trimIndent() to """
+        {
+          "status": "success",
+          "code": 201,
+          "message": "تم إنشاء الحجز بنجاح وهو بانتظار الدفع",
+          "data": {
+            "bookingId": "bk-8820491-yz",
+            "experienceId": "exp-coffee-01",
+            "totalPrice": 50000,
+            "currency": "YER",
+            "bookingStatus": "PENDING_PAYMENT",
+            "qrCodeData": "tajrubah://booking/bk-8820491-yz"
+          }
+        }
+        """.trimIndent()),
+
+        "POST /payments/pay" to ("""
+        {
+          "bookingId": "bk-8820491-yz",
+          "paymentMethod": "MOCK_WALLET",
+          "amount": 50000,
+          "currency": "YER"
+        }
+        """.trimIndent() to """
+        {
+          "status": "success",
+          "code": 200,
+          "message": "تمت معالجة الدفع بنجاح واقتطاع المبلغ من حساب الضمان",
+          "data": {
+            "paymentId": "pay-9204912-ab",
+            "bookingId": "bk-8820491-yz",
+            "amountPaid": 50000,
+            "currency": "YER",
+            "status": "PAID",
+            "transactionId": "tx_yem_wallet_00129",
+            "paidAt": "2026-07-20T21:54:10Z"
+          }
+        }
+        """.trimIndent()),
+
+        "POST /ai/trip-plan" to ("""
+        {
+          "city": "صنعاء القديمة وحراز",
+          "durationDays": 3,
+          "budgetUsd": 300,
+          "travelersCount": 2,
+          "interests": ["مزارع البن", "عمارة تراثية", "حرف يدوية"]
+        }
+        """.trimIndent() to """
+        {
+          "status": "success",
+          "code": 200,
+          "data": {
+            "assistantPlan": "برنامج سياحي ذكي مخصص لصنعاء وحراز لمدة 3 أيام لعدد 2 أشخاص بميزانية 300 دولار",
+            "days": [
+              {
+                "day": 1,
+                "activities": [
+                  "صباحاً: جولة تصفح AR لباب اليمن ومصانع الجنابي القديمة",
+                  "مساءً: تذوق شاي القشر والقهوة الصنعانية ببيت الفن التراثي"
+                ]
+              },
+              {
+                "day": 2,
+                "activities": [
+                  "صباحاً: السفر لـحراز عبر سيارة لاندكروزر دفع رباعي",
+                  "ظهراً: تجربة قطف حبوب البن الخولاني التراثي مع مزارعي حراز"
+                ]
+              },
+              {
+                "day": 3,
+                "activities": [
+                  "صباحاً: زيارة حصن الهجرة الأثري المعلق فوق السحاب",
+                  "مساءً: العودة لصنعاء واستخراج الهدايا وتذكرة الـ QR للمشاركين"
+                ]
+              }
+            ],
+            "totalCostEstimationUsd": 280
+          }
+        }
+        """.trimIndent())
+    )
+
+    Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
+        Text(
+            text = "🔌 تصميم واجهة برمجة التطبيقات (REST API Design)",
+            fontWeight = FontWeight.Bold,
+            color = Color(0xFFC59B27),
+            fontSize = 14.sp
+        )
+        Text(
+            text = "توفر منصة تِجربة واجهات برمجة تطبيقات (APIs) آمنة للغاية لتسهيل الترابط والتكامل السريع والآمن بين منصة تِجربة وكافة الأنظمة الفرعية والجهات الخارجية:",
+            fontSize = 11.sp,
+            color = Color(0xFF94A3B8)
+        )
+
+        // API Specs details
+        Card(
+            colors = CardDefaults.cardColors(containerColor = Color(0x0FFFFFFF)),
+            border = BorderStroke(1.dp, Color(0xFFC59B27).copy(alpha = 0.3f)),
+            shape = RoundedCornerShape(12.dp),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Column(modifier = Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                Text(text = "🌐 مواصفات بروتوكول الـ REST API:", fontWeight = FontWeight.Bold, color = Color(0xFF38BDF8), fontSize = 12.sp)
+                Text(text = "• Base URL: https://api.tajrubah.com/v1", fontSize = 10.sp, color = Color.White)
+                Text(text = "• Security: Bearer JWT Token + SSL Encryption", fontSize = 10.sp, color = Color.White)
+                Text(text = "• Data Format: application/json", fontSize = 10.sp, color = Color.White)
+                Text(text = "• Rate Limiting: 60 requests/minute per client IP", fontSize = 10.sp, color = Color.White)
+            }
+        }
+
+        Divider(color = Color(0x1AFFFFFF))
+
+        Text(
+            text = "🕹️ وحدة محاكاة واختبار الـ API (Interactive API Console):",
+            fontWeight = FontWeight.Bold,
+            color = Color(0xFFC59B27),
+            fontSize = 13.sp
+        )
+        Text(
+            text = "اختر أحد الـ API Endpoints لاستعراض محددات ومخرجات الطلب وتجربة المعالجة التفاعلية الفورية:",
+            fontSize = 11.sp,
+            color = Color(0xFF94A3B8)
+        )
+
+        // LazyRow of API buttons
+        LazyRow(
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            items(endpoints.size) { index ->
+                val parts = endpoints[index].first.split(" ")
+                val method = parts[0]
+                val path = parts[1]
+                Box(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(if (selectedEndpoint == index) Color(0xFFC59B27) else Color(0x13FFFFFF))
+                        .clickable {
+                            selectedEndpoint = index
+                            apiResponse = ""
+                        }
+                        .padding(horizontal = 10.dp, vertical = 6.dp)
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Box(
+                            modifier = Modifier
+                                .background(if (method == "POST") Color(0xFF10B981) else Color(0xFF38BDF8), RoundedCornerShape(4.dp))
+                                .padding(horizontal = 4.dp, vertical = 2.dp)
+                        ) {
+                            Text(text = method, fontSize = 8.sp, fontWeight = FontWeight.Bold, color = Color.Black)
+                        }
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(text = path, fontSize = 10.sp, fontWeight = FontWeight.Bold, color = if (selectedEndpoint == index) Color.Black else Color.White)
+                    }
+                }
+            }
+        }
+
+        // Show Payload if any
+        val selectedItem = endpoints[selectedEndpoint]
+        val payload = selectedItem.second.first
+        val expectedResponse = selectedItem.second.second
+
+        if (payload.isNotEmpty()) {
+            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Text(text = "📥 Request Body (JSON payload):", fontSize = 10.sp, color = Color(0xFF38BDF8), fontWeight = FontWeight.Bold)
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Color.Black, RoundedCornerShape(8.dp))
+                        .padding(8.dp)
+                ) {
+                    Text(text = payload, fontSize = 9.sp, fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace, color = Color(0xFF34D399))
+                }
+            }
+        }
+
+        // Action Button
+        Button(
+            onClick = {
+                isLoading = true
+                apiResponse = ""
+                coroutineScope.launch {
+                    kotlinx.coroutines.delay(600)
+                    isLoading = false
+                    apiResponse = expectedResponse
+                }
+            },
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFC59B27)),
+            shape = RoundedCornerShape(10.dp),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(text = if (isLoading) "جاري إرسال الطلب ومعالجة الـ API..." else "إرسال طلب تجريبي (Send Test Request)", color = Color.Black, fontWeight = FontWeight.Bold, fontSize = 11.sp)
+        }
+
+        // Response view
+        if (isLoading) {
+            Box(modifier = Modifier.fillMaxWidth().height(60.dp), contentAlignment = Alignment.Center) {
+                CircularProgressIndicator(color = Color(0xFFC59B27))
+            }
+        }
+
+        if (apiResponse.isNotEmpty()) {
+            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                    Text(text = "📤 Response (HTTP 200 OK):", fontSize = 10.sp, color = Color(0xFF34D399), fontWeight = FontWeight.Bold)
+                    Text(text = "Format: JSON", fontSize = 9.sp, color = Color(0xFF94A3B8))
+                }
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Color.Black, RoundedCornerShape(8.dp))
+                        .padding(8.dp)
+                ) {
+                    Text(text = apiResponse, fontSize = 9.sp, fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace, color = Color(0xFFE2E8F0))
+                }
+            }
+        }
+    }
+}
+
 
